@@ -27,7 +27,7 @@ var PSQL *sql.DB
 // PSQL Connect Function
 func psqlConnect() *sql.DB {
 	// Initialize Connection
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable", psqlCfg.Host, psqlCfg.Port, psqlCfg.User, psqlCfg.Password, psqlCfg.Name)
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+"password=%s dbname=%s sslmode=disable", psqlCfg.Host, psqlCfg.Port, psqlCfg.User, psqlCfg.Password, psqlCfg.Name)
 	conn, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Println(log.LogLevelFatal, "psql-connect", err.Error())
@@ -37,6 +37,8 @@ func psqlConnect() *sql.DB {
 	err = conn.Ping()
 	if err != nil {
 		log.Println(log.LogLevelFatal, "psql-connect", err.Error())
+	} else {
+		log.Println(log.LogLevelInfo, "psql-connect", "Connect : OK")
 	}
 
 	// Return Connection
