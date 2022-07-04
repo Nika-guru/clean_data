@@ -37,7 +37,7 @@ func init() {
 	// Set Configuration Prefix Value
 	configPrefix := strings.ToUpper(configEnv)
 
-	// Initialize Configuratior : link
+	// Initialize Configuratior :
 	Config = viper.New()
 
 	// Set Configuratior Configuration
@@ -73,14 +73,14 @@ func configLoadFile() {
 // ConfigLoadValues Function to Load Configuration Values
 func configLoadValues() {
 	// Server Name Value
-	Config.SetDefault("SERVER_NAME", "base-service")
+	Config.SetDefault("SERVER_NAME", "go-framework")
 
 	// Server IP Value
 	Config.SetDefault("SERVER_IP", "0.0.0.0")
 	ServerCfg.IP = Config.GetString("SERVER_IP")
 
 	// Server Port Value
-	Config.SetDefault("SERVER_PORT", "3000")
+	Config.SetDefault("SERVER_PORT", "8000")
 	ServerCfg.Port = Config.GetString("SERVER_PORT")
 
 	// Server Store Path Value

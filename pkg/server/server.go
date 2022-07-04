@@ -14,7 +14,6 @@ import (
 // Server Struct
 type Server struct {
 	srv *http.Server
-	// wg  sync.WaitGroup
 }
 
 // Server Configuration Struct
@@ -43,20 +42,11 @@ func (s *Server) Start() {
 	_, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Add to The WaitGroup for The Listener GoRoutine
-	// And Wait for 1 Routine to be Done
-	// s.wg.Add(1)
+	// start server
 	log.Println("{\"label\":\"server-http\",\"level\":\"info\",\"msg\":\"server worker started at pid " + strconv.Itoa(os.Getpid()) + " listening on " + net.JoinHostPort(ServerCfg.IP, ServerCfg.Port) + "\",\"service\":\"" + Config.GetString("SERVER_NAME") + "\",\"time\":" + fmt.Sprint(time.Now().Format(time.RFC3339Nano)) + "\"}")
+	// Server handle all incoming request
 	s.srv.ListenAndServe()
 
-	// Start The Server
-	// log.Println("{\"label\":\"server-http\",\"level\":\"info\",\"msg\":\"server master started at pid " + strconv.Itoa(os.Getpid()) + "\",\"service\":\"" + Config.GetString("SERVER_NAME") + "\",\"time\":" + fmt.Sprint(time.Now().Format(time.RFC3339Nano)) + "\"}")
-	// go func() {
-	// 	log.Println("{\"label\":\"server-http\",\"level\":\"info\",\"msg\":\"server worker started at pid " + strconv.Itoa(os.Getpid()) + " listening on " + net.JoinHostPort(ServerCfg.IP, ServerCfg.Port) + "\",\"service\":\"" + Config.GetString("SERVER_NAME") + "\",\"time\":" + fmt.Sprint(time.Now().Format(time.RFC3339Nano)) + "\"}")
-	// 	s.srv.ListenAndServe()
-
-	// 	s.wg.Done()
-	// }()
 }
 
 // Stop Method for Server
@@ -75,5 +65,4 @@ func (s *Server) Stop() {
 			return
 		}
 	}
-	// s.wg.Wait()
 }
