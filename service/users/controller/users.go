@@ -1,7 +1,8 @@
-package users
+package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -25,12 +26,11 @@ type resGetUsers struct {
 func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	// Database Query here
-	rows, err := db.MySQL.Query("SELECT * FROM users")
+	rows, err := db.PSQL.Query("SELECT * FROM users")
 	if err != nil {
 		router.ResponseInternalError(w, err.Error())
 		return
 	}
-
 	var user model.User
 	var users []model.User
 
@@ -69,7 +69,10 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&user)
 
 	// Database Query
-	_, err := db.MySQL.Exec("INSERT INTO users (name, email) VALUE (?, ?)", user.Name, user.Email)
+	query := fmt.Sprintf("INSERT INTO users VALUES "+"(%d, '%s', '%s');", user.ID, user.Name, user.Email)
+	log.Println(log.LogLevelDebug, "user-query", query)
+
+	_, err := db.PSQL.Exec(query)
 	if err != nil {
 		router.ResponseInternalError(w, err.Error())
 		return
@@ -91,7 +94,8 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Database Query
-	rows, err := db.MySQL.Query("SELECT * FROM users WHERE id=? LIMIT 1", userID)
+	query := fmt.Sprintf("SELECT * FROM users WHERE id=%d", userID)
+	rows, err := db.PSQL.Query(query)
 	if err != nil {
 		router.ResponseInternalError(w, err.Error())
 		return
@@ -145,7 +149,10 @@ func PutUserByID(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&user)
 
 	// Database Query
-	_, err := db.MySQL.Exec("UPDATE users SET name=?, email=? WHERE id=? LIMIT 1", user.Name, user.Email, userID)
+	query := fmt.Sprintf("UPDATE users SET username='%s', email='%s' WHERE id=%d", user.Name, user.Email, userID)
+	log.Println(log.LogLevelDebug, "user-query", query)
+
+	_, err = db.PSQL.Exec(query)
 	if err != nil {
 		router.ResponseInternalError(w, err.Error())
 		return
@@ -167,7 +174,10 @@ func DelUserByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Database Query
-	_, err := db.MySQL.Query("DELETE FROM users WHERE id=? LIMIT 1", userID)
+	query := fmt.Sprintf("DELETE FROM users WHERE id=%d ", userID)
+	log.Println(log.LogLevelDebug, "user-query", query)
+
+	_, err = db.PSQL.Query(query)
 	if err != nil {
 		router.ResponseInternalError(w, err.Error())
 		return

@@ -8,4 +8,4 @@ type User struct {
 }
 
 // Users Array
-var Users []
+var Users []User
