@@ -19,7 +19,7 @@ CRYPT_PUBLIC_KEY_FILE: "./config/keys/public.key"
 DB_DRIVER: "postgres"
 DB_HOST: "127.0.0.1"
 DB_PORT: "5432"
-DB_USER: "user"
+DB_USER: "postgres"
 DB_PASSWORD: "password"
 DB_NAME: "users"
 
