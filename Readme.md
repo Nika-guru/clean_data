@@ -5,7 +5,8 @@ Hi! Đây là **GO Framework** mà team Backend sẽ build để phục vụ cho
 
 # Structure
 
-!Hình ảnh Sourcecode ](https://images.viblo.asia/d61fc6a5-2285-4705-9ff8-395495032db7.png)
+![](https://images.viblo.asia/d61fc6a5-2285-4705-9ff8-395495032db7.png)
+
 
 ### Giải thích tổng quan 
 Cấu trúc Service sẽ được chia làm 3 phần : 
