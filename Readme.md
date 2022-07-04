@@ -5,7 +5,51 @@ Hi! Đây là **GO Framework** mà team Backend sẽ build để phục vụ cho
 
 # Structure
 
-!Hình ảnh Sourcecode ](https://images.viblo.asia/d61fc6a5-2285-4705-9ff8-395495032db7.png)
+```
+1. cmd 
+	 2. main
+		 3. main.go
+ 2. config
+	 3. Keys
+		 4. private.key
+		 5. public.key 
+	 4. development.yaml 
+	 5. production.yaml 
+ 3. docs
+ 4. pkg
+	 5. auth
+		 6. basic.go
+		 7. jwt.go
+	 6. crypt
+		 7. crypt.go
+	 7. db
+		 8. db.go
+		 9. mongo.go
+		 10. mysql.go 
+		 11. postgres.go 
+	 8. log 
+		 9. log.go
+	 9. router 
+		 10. handler.go 
+		 11. middleware.go 
+		 12. response.go 
+		 13. router.go 
+	 10. server 
+		 11. config.go 
+		 12. server.go 
+	 11. **service**
+		 12. index
+			 13. index.go
+			 14. auth.go 
+		 13. **new-service**
+			 14.  **controller**
+				 15. **new-service.go**
+			 15. **model**
+				 16. **new-service.go**
+			 16. **router.go**
+	 12. docker-compose.yml 
+	 13. Makefile 
+```
 
 ### Giải thích tổng quan 
 Cấu trúc Service sẽ được chia làm 3 phần : 
@@ -17,20 +61,26 @@ Phần 3: Phần này là phần quan trọng nhất, các dev sẽ chủ yếu 
 Như hiện tại các bạn có thể thấy mình có để 2 folder và 1 file **router.go** trong thư mục Service. Ý nghĩa và cách thiết kế Service như thế nào : 
 
  1. **Router.go** là nơi mình sẽ thiết kế tất cả các đường dẫn của mình để cho bên ngoài có thể sử dụng, có thể public với tất cả, hoặc tuỳ từng quyền mới có thể truy cập vào API đó.  
-
-     router.Router.Get(router.RouterBasePath+"/users", controller.GetUser) 
+```
+    router.Router.Get(router.RouterBasePath+"/users", controller.GetUser) 
      // API method GET, path : /users , handler function : controller.GetUser 
      
-     router.Router.Post(router.RouterBasePath+"/users", controller.AddUser)
+     router.Router.Post(router.RouterBasePath+"/users", controller.AddUser) 
      // API method POST, path: /users, handler function : controller.AddUser 
 	
 	router.Router.With(auth.JWT).Get(router.RouterBasePath+"/users", users.GetUser)
 	// Check request with auth.JWT , after handler request API GET 
+```
 
-2. **users ** hoặc một cái tên khác ví dụ : **new-service** tuỳ vào nghiệp vụ bạn xử lý. Vì chúng ta sẽ xử lý dưới dạng microservice do đó. 1 Service sẽ chỉ có một Folder này, ở đây tôi đang xử lý **users** service. Bên trong nó chúng ta sẽ thiết kế dạng MVC truyền thống tuy nhiên sẽ không có folder **View**
-	3. **new-service/model** : 	Ở đây chúng ta sẽ khai báo các struct đại diện cho các đối tượng chúng ta cần xử lý ví dụ : User, Asset, Price ... cho từng nghiệp vụ của mình 
-	4. **new-service/controller**: Ở đây chúng ta sẽ khai báo các hàm để xử lý tương ứng với các **path** mà chúng ta đã khai báo ở trong **router.go**. Ví dụ: Users thì sẽ gồm các hàm GetAUsers, DeleteUser... 
-	
+
+
+2. **users** hoặc một cái tên khác ví dụ : **new-service** tuỳ vào nghiệp vụ bạn xử lý. \
+Vì chúng ta sẽ xử lý dưới dạng microservice do đó. 1 Service sẽ chỉ có một Folder này, ở đây tôi đang xử lý **users** service. \
+Bên trong nó chúng ta sẽ thiết kế dạng MVC truyền thống tuy nhiên sẽ không có folder **View**]
+3. **new-service/model** : 	\
+Ở đây chúng ta sẽ khai báo các struct đại diện cho các đối tượng chúng ta cần xử lý ví dụ : User, Asset, Price ... cho từng nghiệp vụ của mình 
+4. **new-service/controller**: Ở đây chúng ta sẽ khai báo các hàm để xử lý tương ứng với các **path** mà chúng ta đã khai báo ở trong **router.go**. \
+Ví dụ: Users thì sẽ gồm các hàm GetAUsers, DeleteUser... 
 
 ## Đọc hiểu cấu trúc và đóng góp nâng cao 
 ## config 
