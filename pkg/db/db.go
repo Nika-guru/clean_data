@@ -12,7 +12,8 @@ func init() {
 	case "postgres":
 		server.Config.SetDefault("DB_PORT", "5432")
 
-		psqlCfg.Host = server.Config.GetString("DB_HOST")
+		// psqlCfg.Host = server.Config.GetString("DB_HOST")
+		psqlCfg.Host = "db"
 		psqlCfg.Port = server.Config.GetString("DB_PORT")
 		psqlCfg.User = server.Config.GetString("DB_USER")
 		psqlCfg.Password = server.Config.GetString("DB_PASSWORD")

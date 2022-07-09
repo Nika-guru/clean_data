@@ -7,6 +7,8 @@ import (
 	"github.com/go-chi/chi"
 
 	// "base/pkg/cache"
+
+	"base/pkg/cache"
 	"base/pkg/db"
 	"base/pkg/log"
 	"base/pkg/server"
@@ -52,6 +54,13 @@ func HealthCheck(w http.ResponseWriter) {
 				ResponseInternalError(w, err.Error())
 				return
 			}
+		case "postgres":
+			err := db.PSQL.Ping()
+			if err != nil {
+				log.Println(log.LogLevelError, "health-check", err.Error())
+				ResponseInternalError(w, err.Error())
+				return
+			}
 		case "mongo":
 			err := db.MongoSession.Ping()
 			if err != nil {
@@ -62,18 +71,18 @@ func HealthCheck(w http.ResponseWriter) {
 		}
 	}
 
-	// Check Cache Connections
-	// if len(server.Config.GetString("CACHE_DRIVER")) != 0 {
-	// 	switch strings.ToLower(server.Config.GetString("CACHE_DRIVER")) {
-	// 	case "redis":
-	// 		_, err := cache.Redis.Ping().Result()
-	// 		if err != nil {
-	// 			log.Println(log.LogLevelError, "health-check", err.Error())
-	// 			ResponseInternalError(w, err.Error())
-	// 			return
-	// 		}
-	// 	}
-	// }
+	// Check Cache Connections : TURN OFF CACHE DRIVER
+	if len(server.Config.GetString("CACHE_DRIVER")) != 0 {
+		switch strings.ToLower(server.Config.GetString("CACHE_DRIVER")) {
+		case "redis":
+			_, err := cache.Redis.Ping().Result()
+			if err != nil {
+				log.Println(log.LogLevelError, "health-check", err.Error())
+				ResponseInternalError(w, err.Error())
+				return
+			}
+		}
+	}
 
 	// Return Success response
 	ResponseSuccess(w, "")

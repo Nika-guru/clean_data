@@ -1,26 +1,51 @@
 version : "3"
 
 services:
+  app:
+    build: .
+    restart: always
+    ports:
+      - "8000:80"
+    depends_on:
+      - db 
   db:
     container_name: "database"
     image: "citusdata/citus:11.0"
     ports: 
       - "5432:5432"
     environment: 
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "password"
-      POSTGRES_DB: "users"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users
     restart: always
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
-          # copy the sql script to create tables
+
+          # copy the sql script to create tables: SQL HERE !!!
   #     - ./db/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+
+
+
+
+# ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ====
+  # redis-master:
+  #   container_name: "redis-server"
+  #   image: 'bitnami/redis:latest'
+  #   ports:
+  #     - '6379'
+  #   environment:
+  #     - REDIS_PASSWORD=password
+  #   volumes:
+  #     - './reids-data:/bitnami'
+
+  # Zookeeper : Admin of Kafka
   # zookeeper:
   #   image: 'bitnami/zookeeper:latest'
   #   ports:
   #     - '2181:2181'
   #   environment:
   #     - ALLOW_ANONYMOUS_LOGIN=yes
+  # Kafka : 
   # kafka:
   #   image: 'bitnami/kafka:latest'
   #   ports:
@@ -33,7 +58,5 @@ services:
   #     - ALLOW_PLAINTEXT_LISTENER=yes
   #   depends_on:
   #     - zookeeper 
-
-
 
   # https://levelup.gitconnected.com/creating-and-filling-a-postgres-db-with-docker-compose-e1607f6f882f
