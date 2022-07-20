@@ -1,6 +1,8 @@
 package log
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -39,7 +41,18 @@ func init() {
 	})
 
 	// Set Log Output to STDOUT
-	logger.SetOutput(os.Stdout)
+	// logger.SetOutput(os.Stdout)
+
+	// If the file doesn't exits, create it or append to the file
+	fileName := GetFilenameDate()
+	filePath := strings.ToLower(server.Config.GetString("LOG_FILE_PATH")) + fileName
+	file, error := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if error != nil {
+		log.Fatalln(error)
+	}
+
+	fmt.Println("Log into file : ", filePath)
+	logger.SetOutput(file)
 
 	// Set Log Level
 	switch strings.ToLower(server.Config.GetString("SERVER_LOG_LEVEL")) {
