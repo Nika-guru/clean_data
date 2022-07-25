@@ -44,8 +44,7 @@ func init() {
 	// logger.SetOutput(os.Stdout)
 
 	// If the file doesn't exits, create it or append to the file
-	fileName := GetFilenameDate()
-	filePath := strings.ToLower(server.Config.GetString("LOG_FILE_PATH")) + fileName
+	filePath := strings.ToLower(server.Config.GetString("LOG_FILE_PATH"))
 	file, error := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if error != nil {
 		log.Fatalln(error)
