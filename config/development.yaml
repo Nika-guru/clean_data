@@ -50,6 +50,13 @@ AWS_SECRET_KEY : "Eu6tvFQ/3oOEurxUzq3a4bMsxum3/rR4aqdPnBnA"
 # CACHE_PASSWORD: "password"
 # CACHE_NAME: 0
 
+## Local Cache Configuration
+LOCAL_CACHE_LIB: "ristretto"
+LOCAL_CACHE_MAX_COST: 1073741824 #maximum cost of cache (1GB = 2 ^ 30 bits)
+LOCAL_CACHE_NUM_COUNTERS: 1e7 #number of keys to track frequency of items (10 milions)
+LOCAL_CACHE_BUFFER_ITEMS: 64 #number of keys per get buffer
+LOCAL_CACHE_METRICS: true #show statistics
+
 # Storage Configuration
 STORAGE_DRIVER: "minio"
 STORAGE_USE_SSL: true

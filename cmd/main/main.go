@@ -4,6 +4,7 @@ import (
 	"log"
 	"strings"
 
+	"base/pkg/cache"
 	"base/pkg/db"
 	"base/pkg/router"
 	"base/pkg/server"
@@ -43,6 +44,13 @@ func main() {
 			defer db.MySQL.Close()
 		case "mongo":
 			defer db.MongoSession.Close()
+		}
+	}
+
+	if len(server.Config.GetString("LOCAL_CACHE_LIB")) != 0 {
+		switch strings.ToLower(server.Config.GetString("REMOTE_CACHE_DRIVER")) {
+		case "coin-price-service":
+			defer cache.LocalCache.Close()
 		}
 	}
 

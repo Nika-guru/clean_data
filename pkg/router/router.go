@@ -72,8 +72,8 @@ func HealthCheck(w http.ResponseWriter) {
 	}
 
 	// Check Cache Connections : TURN OFF CACHE DRIVER
-	if len(server.Config.GetString("CACHE_DRIVER")) != 0 {
-		switch strings.ToLower(server.Config.GetString("CACHE_DRIVER")) {
+	if len(server.Config.GetString("REMOTE_CACHE_DRIVER")) != 0 {
+		switch strings.ToLower(server.Config.GetString("REMOTE_CACHE_DRIVER")) {
 		case "redis":
 			_, err := cache.Redis.Ping().Result()
 			if err != nil {
