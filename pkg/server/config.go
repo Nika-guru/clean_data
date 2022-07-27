@@ -116,4 +116,8 @@ func configLoadValues() {
 
 	// JWT Expiration Time Value
 	Config.SetDefault("JWT_EXPIRATION_TIME_HOURS", 24)
+
+	// Log file config
+	Config.SetDefault("LOG_FILE_PATH", "/root/backend/log/log.txt")
+
 }

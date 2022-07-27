@@ -4,10 +4,12 @@ go 1.18
 
 require (
 	github.com/dgraph-io/ristretto v0.1.0
+	github.com/aws/aws-sdk-go v1.44.58
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v1.5.4
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-sql-driver/mysql v1.6.0
+	github.com/kdar/logrus-cloudwatchlogs v0.0.0-20200414190340-facbc54742f0
 	github.com/lib/pq v1.10.6
 	github.com/minio/minio-go v6.0.14+incompatible
 	github.com/sirupsen/logrus v1.8.1
@@ -22,6 +24,9 @@ require (
 	github.com/go-ini/ini v1.66.6 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
+	github.com/kdar/gtest v0.0.0-20171003232747-b20da4453579 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -30,6 +35,7 @@ require (
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/smartystreets/assertions v1.13.0 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect

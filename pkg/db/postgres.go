@@ -38,7 +38,7 @@ func psqlConnect() *sql.DB {
 	if err != nil {
 		log.Println(log.LogLevelFatal, "psql-connect", err.Error())
 	} else {
-		log.Println(log.LogLevelInfo, "psql-connect", "Connect : OK")
+		log.Println(log.LogLevelInfo, "psql-connect", "Connect database : OK")
 	}
 
 	// Return Connection

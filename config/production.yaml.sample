@@ -19,13 +19,9 @@ CRYPT_PUBLIC_KEY_FILE: "./config/keys/public.key"
 DB_DRIVER: "postgres"
 DB_HOST: "127.0.0.1"
 DB_PORT: "5432"
-DB_USER: "postgres"
+DB_USER: "user"
 DB_PASSWORD: "password"
 DB_NAME: "users"
-
-## AWS S3 Configuration 
-AWS_ACCESS_KEY : "AKIAZK5LO7CLQPOAFGN6"
-AWS_SECRET_KEY : "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"
 
 
 # DB_DRIVER: "mysql"
@@ -43,25 +39,18 @@ AWS_SECRET_KEY : "Eu6tvFQ/3oOEurxUzq3a4bMsxum3/rR4aqdPnBnA"
 # DB_PASSWORD: "password"
 # DB_NAME: "db"
 
-# Cache Configuration
+## Cache Configuration
 # CACHE_DRIVER: "redis"
 # CACHE_HOST: "127.0.0.1"
 # CACHE_PORT: "6379"
 # CACHE_PASSWORD: "password"
 # CACHE_NAME: 0
 
-## Local Cache Configuration
-LOCAL_CACHE_LIB: "ristretto"
-LOCAL_CACHE_MAX_COST: 1073741824 #maximum cost of cache (1GB = 2 ^ 30 bits)
-LOCAL_CACHE_NUM_COUNTERS: 1e7 #number of keys to track frequency of items (10 milions)
-LOCAL_CACHE_BUFFER_ITEMS: 64 #number of keys per get buffer
-LOCAL_CACHE_METRICS: true #show statistics
-
-# Storage Configuration
-STORAGE_DRIVER: "minio"
-STORAGE_USE_SSL: true
-STORAGE_ENDPOINT: ""
-STORAGE_ACCESS_KEY: ""
-STORAGE_SECRET_KEY: ""
-STORAGE_REGION: ""
-STORAGE_BUCKET: ""
+## Storage Configuration
+# STORAGE_DRIVER: "minio"
+# STORAGE_USE_SSL: true
+# STORAGE_ENDPOINT: ""
+# STORAGE_ACCESS_KEY: ""
+# STORAGE_SECRET_KEY: ""
+# STORAGE_REGION: ""
+# STORAGE_BUCKET: ""
