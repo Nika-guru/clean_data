@@ -54,13 +54,26 @@ func (localCacheStore *LocalCacheStore) Get(key string) (any, bool) {
 	return localCacheStore.store.Get(key)
 }
 
-// Delete method to delete a key from cahce.
-func (localCacheStore *LocalCacheStore) Delete(key string) {
+// SetByKey method to set cache by given key with time to live
+func (localCacheStore *LocalCacheStore) SetByKey(key string, value any, timeToLive time.Duration) {
+	localCacheStore.mutex.Lock()
+	defer localCacheStore.mutex.Unlock()
+
+	localCacheStore.store.SetWithTTL(key, value, _defaultCacheItemCost, timeToLive)
+	localCacheStore.store.Wait()
+}
+
+// InvalidateByKey  method to delete a key from cahce.
+func (localCacheStore *LocalCacheStore) InvalidateByKey(key string) {
+	localCacheStore.mutex.Lock()
+	defer localCacheStore.mutex.Unlock()
+
 	localCacheStore.store.Del(key)
+	localCacheStore.store.Wait()
 }
 
 // SetByTags method to set cache by given tags with time to live
-func (localCacheStore *LocalCacheStore) SetByTags(key string, value any, expiry time.Duration, tags []string) {
+func (localCacheStore *LocalCacheStore) SetByTags(key string, value any, timeToLive time.Duration, tags []string) {
 	localCacheStore.mutex.Lock()
 	defer localCacheStore.mutex.Unlock()
 
@@ -74,11 +87,12 @@ func (localCacheStore *LocalCacheStore) SetByTags(key string, value any, expiry 
 		localCacheStore.store.Set(tag, tagSet, _defaultCacheItemCost)
 	}
 
-	localCacheStore.store.SetWithTTL(key, value, _defaultCacheItemCost, expiry)
+	localCacheStore.store.SetWithTTL(key, value, _defaultCacheItemCost, timeToLive)
+	localCacheStore.store.Wait()
 }
 
-// Invalidate method to invalidate cache with given tags.
-func (localCacheStore *LocalCacheStore) Invalidate(tags []string) {
+// InvalidateByTags method to invalidate cache with given tags.
+func (localCacheStore *LocalCacheStore) InvalidateByTags(tags []string) {
 	localCacheStore.mutex.Lock()
 	defer localCacheStore.mutex.Unlock()
 
@@ -96,6 +110,7 @@ func (localCacheStore *LocalCacheStore) Invalidate(tags []string) {
 	for _, k := range keys {
 		localCacheStore.store.Del(k)
 	}
+	localCacheStore.store.Wait()
 }
 
 func (localCacheStore *LocalCacheStore) MetricsString() string {
@@ -104,6 +119,7 @@ func (localCacheStore *LocalCacheStore) MetricsString() string {
 
 // Close method clear and then close the cache store.
 func (localCacheStore *LocalCacheStore) Close() {
+	localCacheStore.store.Wait()
 	localCacheStore.store.Clear()
 	localCacheStore.store.Close()
 }
