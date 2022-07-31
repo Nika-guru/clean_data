@@ -49,7 +49,7 @@ func main() {
 
 	if len(server.Config.GetString("LOCAL_CACHE_LIB")) != 0 {
 		switch strings.ToLower(server.Config.GetString("REMOTE_CACHE_DRIVER")) {
-		case "coin-price-service":
+		case "ristretto":
 			defer cache.LocalCache.Close()
 		}
 	}
