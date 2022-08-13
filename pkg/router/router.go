@@ -85,5 +85,5 @@ func HealthCheck(w http.ResponseWriter) {
 	}
 
 	// Return Success response
-	ResponseSuccess(w, "")
+	ResponseSuccess(w, "200", "")
 }

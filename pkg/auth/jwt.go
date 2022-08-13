@@ -42,14 +42,14 @@ func JWT(next http.Handler) http.Handler {
 		// The First Authorization Section Should Be "Bearer"
 		if len(authHeader) != 2 || authHeader[0] != "Bearer" {
 			log.Println(log.LogLevelWarn, "http-access", "unauthorized method "+r.Method+" at URI "+r.RequestURI)
-			router.ResponseUnauthorized(w)
+			router.ResponseUnauthorized(w, "")
 			return
 		}
 
 		// The Second Authorization Section Should Be The Credentials Payload
 		authPayload := authHeader[1]
 		if len(authPayload) == 0 {
-			router.ResponseBadRequest(w, "")
+			router.ResponseBadRequest(w, "", "")
 			return
 		}
 

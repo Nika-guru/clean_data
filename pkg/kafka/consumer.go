@@ -2,6 +2,8 @@ package kafka
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/segmentio/kafka-go"
@@ -41,13 +43,14 @@ type ConsumerConfig struct {
 	StartOffset int64 // Default ComsumeAllData
 }
 
-type Consumer struct {
-	Context context.Context
-	Reader  *kafka.Reader
+type Consumer[T EventData] struct {
+	context    context.Context
+	reader     *kafka.Reader
+	eventTypes []string
 }
 
 // Consumer Create Method
-func CreateConsumer(config ConsumerConfig) *Consumer {
+func CreateConsumer(config ConsumerConfig, eventTypes []string) *Consumer[EventData] {
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:     config.Brokers,
 		Topic:       config.Topic,
@@ -57,13 +60,27 @@ func CreateConsumer(config ConsumerConfig) *Consumer {
 		MaxWait:     config.MaxWait,
 		StartOffset: config.StartOffset,
 	})
-	return &Consumer{
-		Context: context.Background(),
-		Reader:  reader,
+	return &Consumer[EventData]{
+		context:    context.Background(),
+		reader:     reader,
+		eventTypes: eventTypes,
 	}
 }
 
-func (consumer *Consumer) Consume() ([]byte, error) {
-	data, err := consumer.Reader.ReadMessage(consumer.Context)
-	return data.Value, err
+func (consumer *Consumer[T]) Consume() (*Schema[T], error) {
+	data, err := consumer.reader.ReadMessage(consumer.context)
+	if err != nil {
+		return nil, err
+	}
+
+	var schema = &Schema[T]{}
+	err = json.Unmarshal(data.Value, &schema)
+	if err != nil {
+		return nil, err
+	}
+
+	if !schema.ContainsEventTypes(consumer.eventTypes) {
+		return nil, errors.New("imvalid event type")
+	}
+	return schema, err
 }
