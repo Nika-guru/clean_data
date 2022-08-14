@@ -32,13 +32,15 @@ func routerCORS(next http.Handler) http.Handler {
 func routerRealIP(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Get Real IP from Cannoical Header
-		if XForwardedFor := r.Header.Get(http.CanonicalHeaderKey("X-Forwarded-For")); XForwardedFor != "" {
+		XForwardedFor := http.CanonicalHeaderKey("X-Forwarded-For")
+		XRealIP := http.CanonicalHeaderKey("X-Real-IP")
+		if XForwardedFor != "" {
 			dataIndex := strings.Index(XForwardedFor, ", ")
 			if dataIndex == -1 {
 				dataIndex = len(XForwardedFor)
 			}
 			r.RemoteAddr = XForwardedFor[:dataIndex]
-		} else if XRealIP := r.Header.Get(http.CanonicalHeaderKey("X-Real-IP")); XRealIP != "" {
+		} else if XRealIP != "" {
 			r.RemoteAddr = XRealIP
 		}
 		next.ServeHTTP(w, r)

@@ -2,6 +2,8 @@ package kafka
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/segmentio/kafka-go"
@@ -37,13 +39,14 @@ type ProducerConfig struct {
 	RequiredAcks int //Default value is AcksRequireOne(1)
 }
 
-type Producer struct {
-	Context context.Context
-	Writer  *kafka.Writer
+type Producer[T EventData] struct {
+	context    context.Context
+	writer     *kafka.Writer
+	eventTypes []string
 }
 
 // Producer Create Method
-func CreateProducer(config ProducerConfig) *Producer {
+func CreateProducer(config ProducerConfig, eventTypes []string) *Producer[EventData] {
 	writer := kafka.NewWriter(kafka.WriterConfig{
 		Brokers:      config.Brokers,
 		Topic:        config.Topic,
@@ -51,14 +54,24 @@ func CreateProducer(config ProducerConfig) *Producer {
 		BatchTimeout: config.BatchTimeout,
 		RequiredAcks: config.RequiredAcks,
 	})
-	return &Producer{
-		Context: context.Background(),
-		Writer:  writer,
+	return &Producer[EventData]{
+		context:    context.Background(),
+		writer:     writer,
+		eventTypes: eventTypes,
 	}
 }
 
-func (producer *Producer) Produce(data []byte) error {
-	return producer.Writer.WriteMessages(producer.Context, kafka.Message{
-		Value: data,
+func (producer *Producer[T]) Produce(schema *Schema[T]) error {
+	if !schema.ContainsEventTypes(producer.eventTypes) {
+		return errors.New("imvalid event type")
+	}
+
+	jsonData, err := json.Marshal(schema)
+	if err != nil {
+		return err
+	}
+
+	return producer.writer.WriteMessages(producer.context, kafka.Message{
+		Value: jsonData,
 	})
 }
