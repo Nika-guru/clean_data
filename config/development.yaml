@@ -16,12 +16,12 @@ CRYPT_PUBLIC_KEY_FILE: "./config/keys/public.key"
 
 ## Database Configuration
 
-DB_DRIVER: "postgres"
-DB_HOST: "127.0.0.1"
-DB_PORT: "5432"
-DB_USER: "postgres"
-DB_PASSWORD: "password"
-DB_NAME: "users"
+# DB_DRIVER: "postgres"
+# DB_HOST: "127.0.0.1"
+# DB_PORT: "5432"
+# DB_USER: "postgres"
+# DB_PASSWORD: "password"
+# DB_NAME: "users"
 
 ## AWS S3 Configuration 
 AWS_ACCESS_KEY : "AKIAZK5LO7CLQPOAFGN6"
@@ -58,10 +58,10 @@ LOCAL_CACHE_BUFFER_ITEMS: 64 #number of keys per get buffer
 LOCAL_CACHE_METRICS: true #show statistics
 
 # Storage Configuration
-STORAGE_DRIVER: "minio"
-STORAGE_USE_SSL: true
-STORAGE_ENDPOINT: ""
-STORAGE_ACCESS_KEY: ""
-STORAGE_SECRET_KEY: ""
-STORAGE_REGION: ""
-STORAGE_BUCKET: ""
+# STORAGE_DRIVER: "minio"
+# STORAGE_USE_SSL: true
+# STORAGE_ENDPOINT: ""
+# STORAGE_ACCESS_KEY: ""
+# STORAGE_SECRET_KEY: ""
+# STORAGE_REGION: ""
+# STORAGE_BUCKET: ""

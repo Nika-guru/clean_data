@@ -44,8 +44,15 @@ func (s *Server) Start() {
 
 	// start server
 	fmt.Println("{\"label\":\"server-http\",\"level\":\"info\",\"msg\":\"server worker started at pid " + strconv.Itoa(os.Getpid()) + " listening on " + net.JoinHostPort(ServerCfg.IP, ServerCfg.Port) + "\",\"service\":\"" + Config.GetString("SERVER_NAME") + "\",\"time\":" + fmt.Sprint(time.Now().Format(time.RFC3339Nano)) + "\"}")
+
 	// Server handle all incoming request
-	s.srv.ListenAndServe()
+	errs := make(chan error, 1)
+	go func() {
+		errs <- s.srv.ListenAndServe()
+
+		// Show error
+		<-errs
+	}()
 
 }
 
@@ -53,6 +60,8 @@ func (s *Server) Start() {
 func (s *Server) Stop() {
 	// Initialize Timeout
 	timeout := 5 * time.Second
+
+	fmt.Println("{\"label\":\"server-http\",\"level\":\"info\",\"msg\":\"server worker stoped at pid " + strconv.Itoa(os.Getpid()) + " listening on " + net.JoinHostPort(ServerCfg.IP, ServerCfg.Port) + "\",\"service\":\"" + Config.GetString("SERVER_NAME") + "\",\"time\":" + fmt.Sprint(time.Now().Format(time.RFC3339Nano)) + "\"}")
 
 	// Initialize Context Handler With Timeout
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)

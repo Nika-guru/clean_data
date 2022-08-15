@@ -1,8 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"base/pkg/cache"
 	"base/pkg/db"
@@ -32,6 +36,18 @@ func main() {
 	// Starting Server
 	svr.Start()
 
+	sig := make(chan os.Signal, 1)
+	// Notify Any Signal to OS Signal Channel
+	signal.Notify(sig, os.Interrupt)
+	signal.Notify(sig, syscall.SIGTERM)
+
+	// Return OS Signal Channel
+	// As Exit Sign
+	<-sig
+
+	// Log Break Line
+	fmt.Println("")
+
 	// Stopping Server
 	defer svr.Stop()
 
@@ -39,10 +55,13 @@ func main() {
 	if len(server.Config.GetString("DB_DRIVER")) != 0 {
 		switch strings.ToLower(server.Config.GetString("DB_DRIVER")) {
 		case "postgres":
+			log.Println("Stoped postgres !")
 			defer db.PSQL.Close()
 		case "mysql":
+			log.Println("Stoped mysql !")
 			defer db.MySQL.Close()
 		case "mongo":
+			log.Println("Stoped mongo !")
 			defer db.MongoSession.Close()
 		}
 	}
@@ -50,6 +69,7 @@ func main() {
 	if len(server.Config.GetString("LOCAL_CACHE_LIB")) != 0 {
 		switch strings.ToLower(server.Config.GetString("REMOTE_CACHE_DRIVER")) {
 		case "ristretto":
+			log.Println("Stoped cache !")
 			defer cache.LocalCache.Close()
 		}
 	}
