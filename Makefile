@@ -5,5 +5,4 @@ build:
 	go build cmd/main/main.go
 
 clean:
-	make clean-dist
 	rm -rf vendor
