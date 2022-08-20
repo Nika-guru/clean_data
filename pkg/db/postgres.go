@@ -26,6 +26,9 @@ var PSQL *sql.DB
 
 // PSQL Connect Function
 func psqlConnect() *sql.DB {
+
+	fmt.Println("Connecting database ....", psqlCfg.Host)
+
 	// Initialize Connection
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+"password=%s dbname=%s sslmode=disable", psqlCfg.Host, psqlCfg.Port, psqlCfg.User, psqlCfg.Password, psqlCfg.Name)
 	conn, err := sql.Open("postgres", psqlInfo)

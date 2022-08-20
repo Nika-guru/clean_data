@@ -17,11 +17,11 @@ CRYPT_PUBLIC_KEY_FILE: "./config/keys/public.key"
 ## Database Configuration
 
 DB_DRIVER: "postgres"
-DB_HOST: "45.76.186.191"
+DB_HOST: "139.180.152.195"
 DB_PORT: "5432"
 DB_USER: "postgres"
 DB_PASSWORD: "password"
-DB_NAME: "test"
+DB_NAME: "postgres"
 
 ## AWS S3 Configuration 
 
