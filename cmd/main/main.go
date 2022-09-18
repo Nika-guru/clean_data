@@ -67,7 +67,7 @@ func main() {
 	}
 
 	if len(server.Config.GetString("LOCAL_CACHE_LIB")) != 0 {
-		switch strings.ToLower(server.Config.GetString("REMOTE_CACHE_DRIVER")) {
+		switch strings.ToLower(server.Config.GetString("LOCAL_CACHE_LIB")) {
 		case "ristretto":
 			log.Println("Stoped cache !")
 			defer cache.LocalCache.Close()
