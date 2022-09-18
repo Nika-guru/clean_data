@@ -1,9 +1,11 @@
 package kafka
 
 import (
+	"base/pkg/log"
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/segmentio/kafka-go"
@@ -11,9 +13,12 @@ import (
 
 // RequiredAcks enum
 const (
-	AcksRequireNone = 0  // fire-and-forget, do not wait for acknowledgements from the
-	AcksRequireOne  = 1  // only wait for the leader to acknowledge - good for non-transactional data
-	AcksRequireAll  = -1 // wait for all brokers to acknowledge the writes (In-Sync Replicas)
+	// fire-and-forget, do not wait for acknowledgements from the cluster
+	AcksRequireNone = kafka.RequireNone
+	// only wait for the leader to acknowledge - good for non-transactional data
+	AcksRequireOne = kafka.RequireOne
+	// wait for all brokers to acknowledge the writes (In-Sync Replicas)
+	AcksRequireAll = kafka.RequireAll
 )
 
 // Local Cache Configuration Struct
@@ -36,26 +41,29 @@ type ProducerConfig struct {
 		3. No one acknowledges receiving the message (0). This is basically a fire-and-forget mode, where we don’t care if our message is received or not. This should only be used for data that you are ok with losing a bit of, but require high throughput for.
 
 	*/
-	RequiredAcks int //Default value is AcksRequireOne(1)
+	RequiredAcks kafka.RequiredAcks //Default value is AcksRequireOne(1)
 }
 
+const (
+	_defaultKafkaTimeout = 250 * time.Millisecond
+)
+
 type Producer[T EventData] struct {
-	context    context.Context
 	writer     *kafka.Writer
 	eventTypes []string
 }
 
 // Producer Create Method
 func CreateProducer(config ProducerConfig, eventTypes []string) *Producer[EventData] {
-	writer := kafka.NewWriter(kafka.WriterConfig{
-		Brokers:      config.Brokers,
-		Topic:        config.Topic,
-		BatchSize:    config.BatchSize,
-		BatchTimeout: config.BatchTimeout,
-		RequiredAcks: config.RequiredAcks,
-	})
+	writer := &kafka.Writer{
+		Addr:                   kafka.TCP(config.Brokers...),
+		Topic:                  config.Topic,
+		BatchSize:              config.BatchSize,
+		BatchTimeout:           config.BatchTimeout,
+		RequiredAcks:           config.RequiredAcks,
+		AllowAutoTopicCreation: true,
+	}
 	return &Producer[EventData]{
-		context:    context.Background(),
 		writer:     writer,
 		eventTypes: eventTypes,
 	}
@@ -63,7 +71,7 @@ func CreateProducer(config ProducerConfig, eventTypes []string) *Producer[EventD
 
 func (producer *Producer[T]) Produce(schema *Schema[T]) error {
 	if !schema.ContainsEventTypes(producer.eventTypes) {
-		return errors.New("imvalid event type")
+		return errors.New("invalid event type")
 	}
 
 	jsonData, err := json.Marshal(schema)
@@ -71,7 +79,25 @@ func (producer *Producer[T]) Produce(schema *Schema[T]) error {
 		return err
 	}
 
-	return producer.writer.WriteMessages(producer.context, kafka.Message{
-		Value: jsonData,
-	})
+	const retries = 3
+	for i := 0; i < retries; i++ {
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer cancel()
+
+		// attempt to create topic prior to publishing the message
+		err = producer.writer.WriteMessages(ctx, kafka.Message{
+			Value: jsonData,
+		})
+
+		// Error 5 : LeaderNotAvailable | Wait to create topic
+		if errors.Is(err, kafka.Error(5)) || errors.Is(err, context.DeadlineExceeded) {
+			fmt.Println("Kafka wait ...")
+			time.Sleep(_defaultKafkaTimeout)
+			continue
+		}
+		if err != nil {
+			log.Println(log.LogLevelError, "kafka-write: ", err)
+		}
+	}
+	return nil
 }
