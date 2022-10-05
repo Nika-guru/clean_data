@@ -81,22 +81,17 @@ func (producer *Producer[T]) Produce(schema *Schema[T]) error {
 
 	const retries = 3
 	for i := 0; i < retries; i++ {
-		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-		defer cancel()
-
 		// attempt to create topic prior to publishing the message
-		err = producer.writer.WriteMessages(ctx, kafka.Message{
+		err = producer.writer.WriteMessages(context.Background(), kafka.Message{
 			Value: jsonData,
 		})
 
-		// Error 5 : LeaderNotAvailable | Wait to create topic
-		if errors.Is(err, kafka.Error(5)) || errors.Is(err, context.DeadlineExceeded) {
+		//LeaderNotAvailable | Message send timeout or errors
+		if err != nil {
+			log.Println(log.LogLevelError, "kafka-write: ", err)
 			fmt.Println("Kafka wait ...")
 			time.Sleep(_defaultKafkaTimeout)
 			continue
-		}
-		if err != nil {
-			log.Println(log.LogLevelError, "kafka-write: ", err)
 		} else {
 			break
 		}
