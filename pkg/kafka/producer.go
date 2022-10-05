@@ -97,6 +97,8 @@ func (producer *Producer[T]) Produce(schema *Schema[T]) error {
 		}
 		if err != nil {
 			log.Println(log.LogLevelError, "kafka-write: ", err)
+		} else {
+			break
 		}
 	}
 	return nil
