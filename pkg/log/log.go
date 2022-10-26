@@ -3,6 +3,8 @@ package log
 import (
 	// "fmt"
 	// "log"
+	"fmt"
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -40,18 +42,20 @@ func init() {
 		TimestampFormat:  time.RFC3339Nano,
 	})
 
-	// Set Log Output to STDOUT
-	logger.SetOutput(os.Stdout)
+	if strings.ToLower(server.Config.GetString("LOG_OUTPUT")) == "console" {
+		// Set Log Output to STDOUT
+		logger.SetOutput(os.Stdout)
+		fmt.Println("Log into console ")
+	} else {
+		filePath := server.Config.GetString("LOG_OUTPUT")
+		file, error := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if error != nil {
+			log.Fatalln(error)
+		}
 
-	// If the file doesn't exits, create it or append to the file
-	// filePath := strings.ToLower(server.Config.GetString("LOG_FILE_PATH"))
-	// file, error := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	// if error != nil {
-	// 	log.Fatalln(error)
-	// }
-
-	// fmt.Println("Log into file : ", filePath)
-	// logger.SetOutput(file)
+		fmt.Println("Log into file : ", filePath)
+		logger.SetOutput(file)
+	}
 
 	// Set Log Level
 	switch strings.ToLower(server.Config.GetString("SERVER_LOG_LEVEL")) {

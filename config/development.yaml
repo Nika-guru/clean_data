@@ -23,16 +23,12 @@ DB_USER: "postgres"
 DB_PASSWORD: "password"
 DB_NAME: "postgres"
 
-## AWS S3 Configuration 
 
-
-# DB_DRIVER: "mysql"
-# DB_HOST: "127.0.0.1"
-# DB_PORT: "3000"
-# DB_USER: "user"
-# DB_PASSWORD: "password"
-# DB_NAME: "db"
-
+# Log config : ABSOLUTE PATH
+# LOG_OUTPUT : "CONSOLE" # OUTPUT CONSOLE
+LOG_OUTPUT : "/home/BACKEND/base-service.log"   # IF COMMENT : LOG_OUTPUT = CONSOLE
+# /home/BACKEND/base-service.log
+# AWS S3 Configuration 
 
 # DB_DRIVER: "mongo"
 # DB_HOST: "127.0.0.1"

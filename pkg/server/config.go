@@ -117,7 +117,8 @@ func configLoadValues() {
 	// JWT Expiration Time Value
 	Config.SetDefault("JWT_EXPIRATION_TIME_HOURS", 24)
 
-	// Log file config
-	Config.SetDefault("LOG_FILE_PATH", "//Users/nguyenminhdan/Desktop/dev/log/log.txt")
+	// CONFIG DEFAULT : CONSOLE
+	Config.SetDefault("LOG_OUTPUT", "CONSOLE")
+	ServerCfg.Port = Config.GetString("LOG_OUTPUT")
 
 }
