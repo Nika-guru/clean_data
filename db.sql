@@ -21,9 +21,9 @@ create table account_reaction(
 	accountId bigint not null,
 	username varchar  null,
 	reactionType bigint not null, --like, dislike, trash
+	productId bigint,
 	createddate timestamp NOT NULL,
-    updateddate timestamp NOT NULL,
-	productId bigint not null
+    updateddate timestamp NOT NULL
 );
 drop index if exists idx_account_reaction_reactionType;
 create index idx_account_reaction_reactionType on account_reaction using hash(reactionType); --get one
@@ -35,10 +35,10 @@ create table reply (
 	id  bigserial not null,
 	reviewId bigint null,
 	accountid bigint null,
+	productId bigint,
 	content varchar null,
 	createddate timestamp NOT NULL,
-    updateddate timestamp NOT NULL,
-	productId bigint not null
+    updateddate timestamp NOT NULL
 );
 drop index if exists idx_reply_reviewId;
 create index idx_reply_reviewId on reply using btree(reviewId); --get list
@@ -89,6 +89,7 @@ create index idx_sub_category_id on sub_category using hash(categoryId); --get l
 
 
 
+
 drop table if exists product_category;
 create table product_category(
 	productId bigint not null,
@@ -135,8 +136,10 @@ create index idx_product_statistic_marketcap on product_statistic using btree(ma
 create index idx_product_statistic_volume on product_statistic using btree(volume); --soring
 create index idx_product_statistic_totalUsed on product_statistic using btree(totalUsed); --soring
 
-drop table if exists product_raw_category;
+
 create table product_raw_category(
 	productId bigint not null,
 	prodcutCategories varchar
-);
+)
+
+
