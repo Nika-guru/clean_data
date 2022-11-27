@@ -18,12 +18,12 @@ func CrawlProductsInfo() {
 }
 
 func CrawlProductsInfoByProductType(endpointProductInfo string) {
-	for pageIdx := 1; pageIdx < 2; pageIdx++ {
+	for pageIdx := 1; ; pageIdx++ {
 		url := getProductsInfoUrlFromEndpoint(endpointProductInfo, pageIdx)
 
-		dom, err := getHtmlDomByUrl(url)
+		dom, err := GetHtmlDomByUrl(url)
 		if err != nil {
-			log.Println(log.LogLevelError, `review/crawl/revain/crawl_products_info.go/CrawlProductsInfoByProductType/getHtmlDomByUrl`, err.Error())
+			log.Println(log.LogLevelError, `review/crawl/revain/crawl_products_info.go/CrawlProductsInfoByProductType/GetHtmlDomByUrl`, err.Error())
 		}
 
 		//reponse not equal 200(404 --> No data to crawl)
@@ -47,20 +47,23 @@ func CrawlProductsInfoByProductType(endpointProductInfo string) {
 		endpointDetailRepo.ConvertFrom(productDtoRepo)
 		//SAve to cache, for crawl detail later
 		for _, detailEndpoint := range endpointDetailRepo.Endpoints {
-			//Call detail product
-			err := CrawlProductDetail(detailEndpoint)
-			if err != nil {
-				log.Println(log.LogLevelDebug, "service/review/crawl/revain/crawl_products_info/go/CrawlProductsInfoByProductType/CrawlProdcutDetail", err.Error())
-				continue
-			}
+			//TODO: limit thread here
+			go func(detailEndpoint dto.EndpointDetail) {
+				//Call detail product
+				err := CrawlProductDetail(detailEndpoint)
+				if err != nil {
+					log.Println(log.LogLevelDebug, "service/review/crawl/revain/crawl_products_info/go/CrawlProductsInfoByProductType/CrawlProdcutDetail", err.Error())
+					// continue
+				}
 
-			err = CrawlProductReviews(detailEndpoint)
-			if err != nil {
-				log.Println(log.LogLevelDebug, "service/review/crawl/revain/crawl_products_info/go/CrawlProductsInfoByProductType/CrawlProdcutReviews", err.Error())
-				continue
-			}
+				err = CrawlProductReviewsByPage(detailEndpoint)
+				if err != nil {
+					log.Println(log.LogLevelDebug, "service/review/crawl/revain/crawl_products_info/go/CrawlProductsInfoByProductType/CrawlProdcutReviews", err.Error())
+					// continue
+				}
+			}(detailEndpoint)
+
 		}
-
 	}
 }
 
@@ -73,10 +76,10 @@ func getProductsInfoUrlFromEndpoint(endpointProductInfo string, pageIdx int) str
 func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []*dto.ProductInfo {
 	products := make([]*dto.ProductInfo, 0)
 
-	domKey := `div` + convertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Grid-sc-1mngh6p-2 dzjLTP`)
+	domKey := `div` + ConvertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Grid-sc-1mngh6p-2 dzjLTP`)
 	dom.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
-		domKey = `div` + convertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Flex-sc-1mngh6p-1 ReviewTargetCard__Card-sc-qbvmhm-0 jMDOvK kHppZh`)
+		domKey = `div` + ConvertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Flex-sc-1mngh6p-1 ReviewTargetCard__Card-sc-qbvmhm-0 jMDOvK kHppZh`)
 		s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
 			product := &dto.ProductInfo{}
@@ -93,7 +96,7 @@ func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []*d
 
 			})
 
-			domKey = `a` + convertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 Anchor-sc-1oa4wrg-0 gtFTPK gOcOhU`)
+			domKey = `a` + ConvertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 Anchor-sc-1oa4wrg-0 gtFTPK gOcOhU`)
 			s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
 				attrKey := `href`
@@ -107,7 +110,7 @@ func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []*d
 
 			})
 
-			domKey = `div` + convertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 bkUBKu`)
+			domKey = `div` + ConvertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 bkUBKu`)
 			typeNames := ``
 			s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
@@ -120,7 +123,7 @@ func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []*d
 			typeNameArr := strings.Split(strings.Trim(typeNames, " "), `,`)
 			product.ProductCategories = typeNameArr
 
-			domKey = `p` + convertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 ReviewTargetCard__LineClamp-sc-qbvmhm-1 ReviewTargetCard___StyledLineClamp-sc-qbvmhm-2 jVbmuR dUpQvL dxYXvO`)
+			domKey = `p` + ConvertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 ReviewTargetCard__LineClamp-sc-qbvmhm-1 ReviewTargetCard___StyledLineClamp-sc-qbvmhm-2 jVbmuR dUpQvL dxYXvO`)
 			s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
 				shortDescription := s.Text()

@@ -1,7 +1,7 @@
 package dto
 
 type ProductReviewRepo struct {
-	ProductReviews []ProductReview
+	ProductReviews []*ProductReview
 }
 
 type ProductReview struct {

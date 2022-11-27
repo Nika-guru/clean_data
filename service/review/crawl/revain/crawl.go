@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -14,10 +15,17 @@ const (
 	_urlQueryParamsProductReviews = `?page=%d&sortBy=recent&direction=ASC`
 )
 
+const (
+	_respSuccessStatusCode     = 200
+	_respTooManyReqStatusCode  = 429
+	_waitDurationWhenRateLimit = 5 * time.Second
+)
+
 func init() {
 	go CrawlProductsInfo()
 }
-func getHtmlDomByUrl(url string) (*goquery.Document, error) {
+func GetHtmlDomByUrl(url string) (*goquery.Document, error) {
+beginCallAPI:
 	// Request the HTML page.
 	res, err := http.Get(url)
 	if err != nil {
@@ -25,7 +33,13 @@ func getHtmlDomByUrl(url string) (*goquery.Document, error) {
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != 200 {
+	if res.StatusCode != _respSuccessStatusCode {
+
+		if _respTooManyReqStatusCode == res.StatusCode {
+			time.Sleep(_waitDurationWhenRateLimit)
+			goto beginCallAPI
+		}
+
 		//TODO: research why yobit got exception
 		return nil, errors.New(`status respose not 200, actually: ` + res.Status + ` at url ` + url)
 	}
@@ -38,7 +52,7 @@ func getHtmlDomByUrl(url string) (*goquery.Document, error) {
 	return dom, nil
 }
 
-func convertClassesFormatFromBrowserToGoQuery(input string) string {
+func ConvertClassesFormatFromBrowserToGoQuery(input string) string {
 	classes := input
 	classes = `.` + classes
 	classes = strings.ReplaceAll(classes, ` `, `.`)

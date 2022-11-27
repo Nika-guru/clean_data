@@ -12,9 +12,9 @@ import (
 func CrawlProductDetail(endpoint dto.EndpointDetail) error {
 	url := getProductDetailUrlFromEndpoint(endpoint.Endpoint)
 
-	dom, err := getHtmlDomByUrl(url)
+	dom, err := GetHtmlDomByUrl(url)
 	if err != nil {
-		log.Println(log.LogLevelError, `review/crawl/revain/crawl_products_detail.go/CrawlProdcutDetail/getHtmlDomByUrl`, err.Error())
+		log.Println(log.LogLevelError, `review/crawl/revain/crawl_products_detail.go/CrawlProdcutDetail/GetHtmlDomByUrl`, err.Error())
 	}
 
 	//reponse not equal 200(404 --> No data to crawl)
