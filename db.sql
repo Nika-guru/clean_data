@@ -22,7 +22,8 @@ create table account_reaction(
 	username varchar  null,
 	reactionType bigint not null, --like, dislike, trash
 	createddate timestamp NOT NULL,
-    updateddate timestamp NOT NULL
+    updateddate timestamp NOT NULL,
+	productId bigint not null
 );
 drop index if exists idx_account_reaction_reactionType;
 create index idx_account_reaction_reactionType on account_reaction using hash(reactionType); --get one
@@ -36,7 +37,8 @@ create table reply (
 	accountid bigint null,
 	content varchar null,
 	createddate timestamp NOT NULL,
-    updateddate timestamp NOT NULL
+    updateddate timestamp NOT NULL,
+	productId bigint not null
 );
 drop index if exists idx_reply_reviewId;
 create index idx_reply_reviewId on reply using btree(reviewId); --get list
