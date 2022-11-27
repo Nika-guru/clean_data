@@ -36,19 +36,30 @@ func CrawlProductsInfoByProductType(endpointProductInfo string) {
 		productDtoRepo.Products = productInfo
 		productDaoRepo := dao.ProductRepo{}
 		productDaoRepo.ConverFrom(productDtoRepo)
-		productDaoRepo.InsertDB() //insert finish --> has id
+		productDaoRepo.InsertDB() //insert finish --> has id incremental in model dao also dto
 
-		// endpointDetailRepo := dto.EndpointDetailRepo{}
-		// //get list endpoint product id
-		// for _, productInfo := range productRepo.Products {
-		// 	endpointDetailRepo.Endpoints = append(endpointDetailRepo.Endpoints, dto.EndpointDetail{
-		// 		ProductId: productInfo.ProductId,
-		// 		Endpoint:  productInfo.EndpointProductDetail,
-		// 	})
+		productCategoryDaoRepo := dao.ProductCategoryRepo{}
+		fmt.Println(`current url: `, url)
+		productCategoryDaoRepo.ConverFrom(productDtoRepo)
+		productCategoryDaoRepo.InsertDB()
 
-		// 	productInfo.ProductId
-		// 	productInfo.ProductCategories
+		fmt.Println("len: ", len(productCategoryDaoRepo.ProductCategories))
+		for _, v := range productCategoryDaoRepo.ProductCategories {
+			if v.SubCategoryId != nil {
+				fmt.Println(*v.SubCategoryId, v.CategoryId, v.ProductId)
+			} else {
+				fmt.Println(v.SubCategoryId, v.CategoryId, v.ProductId)
+			}
+		}
+
+		endpointDetailRepo := dto.EndpointDetailRepo{}
+		endpointDetailRepo.ConvertFrom(productDtoRepo)
+		// //SAve to cache, for crawl detail later
+		// for _, detailEndpoint := range endpointDetailRepo.Endpoints {
+		// 	//Call detail
+		// 	fmt.Println(detailEndpoint.Endpoint)
 		// }
+
 	}
 }
 
@@ -58,8 +69,8 @@ func getProductsInfoUrlFromProductTypeName(endpointProductInfo string, pageIdx i
 	return url
 }
 
-func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []dto.ProductInfo {
-	products := make([]dto.ProductInfo, 0)
+func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []*dto.ProductInfo {
+	products := make([]*dto.ProductInfo, 0)
 
 	domKey := `div` + convertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Grid-sc-1mngh6p-2 dzjLTP`)
 	dom.Find(domKey).Each(func(i int, s *goquery.Selection) {
@@ -67,7 +78,7 @@ func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []dt
 		domKey = `div` + convertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Flex-sc-1mngh6p-1 ReviewTargetCard__Card-sc-qbvmhm-0 jMDOvK kHppZh`)
 		s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
-			product := dto.ProductInfo{}
+			product := &dto.ProductInfo{}
 			product.CrawlSource = currentUrl
 
 			domKey = `img`
@@ -105,7 +116,7 @@ func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []dt
 				}
 
 			})
-			typeNameArr := strings.Split(strings.ReplaceAll(typeNames, " ", ""), `,`)
+			typeNameArr := strings.Split(strings.Trim(typeNames, " "), `,`)
 			product.ProductCategories = typeNameArr
 
 			domKey = `p` + convertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 ReviewTargetCard__LineClamp-sc-qbvmhm-1 ReviewTargetCard___StyledLineClamp-sc-qbvmhm-2 jVbmuR dUpQvL dxYXvO`)

@@ -14,13 +14,15 @@ func CrawlProductDetail() {
 	//convert list to map
 	productInfoMap := make(map[int64]dao.Product)
 	for _, productInfo := range repo.Products {
+		tmpProductInfo := *productInfo
 		_, found := productInfoMap[int64(productInfo.ProductId)]
 		if !found {
-			productInfoMap[int64(productInfo.ProductId)] = productInfo
+			productInfoMap[int64(productInfo.ProductId)] = tmpProductInfo
 		}
 	}
 	for _, productInfo := range repo.Products {
-		CrawlProductsDetailByProductInfo(productInfo, productInfoMap)
+		tmpProductInfo := *productInfo
+		CrawlProductsDetailByProductInfo(tmpProductInfo, productInfoMap)
 	}
 }
 

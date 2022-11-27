@@ -24,6 +24,7 @@ var ENDPOINTS_PRODUCT_INFO_REVAIN = [...]string{
 	`/categories/nft-marketplaces`,
 }
 
-const (
-	KEY_CACHE_PRODUCT_DETAIL = `KEY_CACHE_PRODUCT_DETAIL`
-)
+var MAP_CATEGORY_PRODUCT_REVAIN = map[string]bool{
+	`Crypto Projects`:              true,
+	`Online Reputation Management`: true,
+}

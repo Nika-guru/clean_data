@@ -87,7 +87,6 @@ create index idx_sub_category_id on sub_category using hash(categoryId); --get l
 
 
 
-
 drop table if exists product_category;
 create table product_category(
 	productId bigint not null,

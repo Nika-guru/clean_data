@@ -1,12 +1,12 @@
 package dto
 
 type ProductInfoRepo struct {
-	Products []ProductInfo
+	Products []*ProductInfo
 }
 
 type ProductInfo struct {
 	//For product info
-	ProductId          uint64         `json:"product_id"`
+	ProductId          *uint64        `json:"product_id"` //point to dao
 	ProductName        string         `json:"title"`
 	ProductImage       string         `json:"image"`
 	ProductDescription string         `json:"description"`

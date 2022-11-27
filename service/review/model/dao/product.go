@@ -10,7 +10,7 @@ import (
 )
 
 type ProductRepo struct {
-	Products []Product
+	Products []*Product
 }
 
 type Product struct {
@@ -45,8 +45,6 @@ func (product *Product) InsertDB() error {
 		($1 , $2 , $3 ,
 			$4 , $5 , $6 ,
 			$7)
-
-	
 		RETURNING productid;
 	`
 
@@ -59,22 +57,25 @@ func (product *Product) InsertDB() error {
 		return err
 	}
 
+	var id uint64
 	err = db.PSQL.QueryRow(query,
 		product.ProductName, product.ProductImage, product.ProductDescription,
 		productDetailJSONB, product.CrawlSource, product.CreatedDate,
-		product.UpdatedDate).Scan(&product.ProductId)
+		product.UpdatedDate).Scan(&id)
+	product.ProductId = id
 	return err
 }
 
 func (daoRepo *ProductRepo) ConverFrom(dtoRepo *dto.ProductInfoRepo) {
 
 	for _, productDto := range dtoRepo.Products {
-		productDao := Product{
+		productDao := &Product{
 			ProductName:   productDto.ProductName,
 			ProductImage:  productDto.ProductImage,
 			ProductDetail: productDto.ProductDetail,
 			CrawlSource:   productDto.CrawlSource,
 		}
+		productDto.ProductId = &productDao.ProductId
 		daoRepo.Products = append(daoRepo.Products, productDao)
 	}
 }
@@ -116,7 +117,7 @@ func (repo *ProductRepo) SelectByTitleWithShortDescriptionAndType(keyword string
 	}
 	defer rows.Close()
 	for rows.Next() {
-		product := Product{}
+		product := &Product{}
 		productDetailJSONB := []byte{}
 		rows.Scan(&product.ProductName, &product.ProductImage, &product.ProductDescription,
 			&productDetailJSONB, &product.CrawlSource, &product.CreatedDate,
