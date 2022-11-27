@@ -133,12 +133,8 @@ create index idx_product_statistic_marketcap on product_statistic using btree(ma
 create index idx_product_statistic_volume on product_statistic using btree(volume); --soring
 create index idx_product_statistic_totalUsed on product_statistic using btree(totalUsed); --soring
 
---------------------distributed database-----------------------
-
-SELECT create_reference_table('product_category');
-SELECT create_reference_table('sub_category');
-SELECT create_reference_table('category');
-
-SELECT create_distributed_table('product_contact', 'productId');
-SELECT create_distributed_table('product', 'id');
-SELECT create_distributed_table('product_detail', 'productId');
+drop table if exists product_raw_category;
+create table product_raw_category(
+	productId bigint not null,
+	prodcutCategories varchar
+);

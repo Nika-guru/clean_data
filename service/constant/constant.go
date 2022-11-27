@@ -12,19 +12,28 @@ const (
 //crawl data from revain
 var ENDPOINTS_PRODUCT_INFO_REVAIN = [...]string{
 	`/projects/erc-20`,
-	`/projects/trc-20`,
-	`/projects/stablecoins`,
-	`/projects/defi`,
-	`/exchanges`,
-	`/wallets`,
-	`/blockchain-games`,
-	`/crypto-cards`,
-	`/mining-pools`,
-	`/crypto-trainings`,
-	`/categories/nft-marketplaces`,
+	// `/projects/trc-20`,
+	// `/projects/stablecoins`,
+	// `/projects/defi`,
+	// `/exchanges`,
+	// `/wallets`,
+	// `/blockchain-games`,
+	// `/crypto-cards`,
+	// `/mining-pools`,
+	// `/crypto-trainings`,
+	// `/categories/nft-marketplaces`,
 }
 
 var MAP_CATEGORY_PRODUCT_REVAIN = map[string]bool{
-	`Crypto Projects`:              true,
-	`Online Reputation Management`: true,
+	DEFAULT_CATEGORY_PRODUCT_REVAIN: true,
+	`Online Reputation Management`:  true,
+	`Crypto Exchanges`:              true,
+	`Crypto Wallets`:                true,
+	`Blockchain Games`:              true,
+	`NFT Marketplaces`:              true,
+	`Crypto Cards`:                  true,
+	`Bitcoin mining pools`:          true,
+	`Crypto Trainings & Courses`:    true,
 }
+
+const DEFAULT_CATEGORY_PRODUCT_REVAIN = `Crypto Projects`

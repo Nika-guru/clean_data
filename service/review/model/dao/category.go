@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"fmt"
 	"review-service/pkg/db"
 )
 
@@ -39,8 +38,6 @@ func (category *Category) InsertDB() error {
 
 		RETURNING id;
 	`
-	fmt.Println(`====run here====`, category.CategoryName)
-
 	var categoryId uint64
 	err := db.PSQL.QueryRow(query,
 		category.CategoryName).Scan(&categoryId)

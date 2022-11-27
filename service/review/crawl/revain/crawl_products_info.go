@@ -19,7 +19,7 @@ func CrawlProductsInfo() {
 
 func CrawlProductsInfoByProductType(endpointProductInfo string) {
 	for pageIdx := 1; pageIdx < 2; pageIdx++ {
-		url := getProductsInfoUrlFromProductTypeName(endpointProductInfo, pageIdx)
+		url := getProductsInfoUrlFromEndpoint(endpointProductInfo, pageIdx)
 
 		dom, err := getHtmlDomByUrl(url)
 		if err != nil {
@@ -31,40 +31,41 @@ func CrawlProductsInfoByProductType(endpointProductInfo string) {
 			break
 		}
 
-		productInfo := extractProductsInfoByHtmlDom(dom, url)
+		productInfoList := extractProductsInfoByHtmlDom(dom, url)
 		productDtoRepo := &dto.ProductInfoRepo{}
-		productDtoRepo.Products = productInfo
+		productDtoRepo.Products = productInfoList
 		productDaoRepo := dao.ProductRepo{}
 		productDaoRepo.ConverFrom(productDtoRepo)
 		productDaoRepo.InsertDB() //insert finish --> has id incremental in model dao also dto
 
 		productCategoryDaoRepo := dao.ProductCategoryRepo{}
-		fmt.Println(`current url: `, url)
 		productCategoryDaoRepo.ConverFrom(productDtoRepo)
 		productCategoryDaoRepo.InsertDB()
 
-		fmt.Println("len: ", len(productCategoryDaoRepo.ProductCategories))
-		for _, v := range productCategoryDaoRepo.ProductCategories {
-			if v.SubCategoryId != nil {
-				fmt.Println(*v.SubCategoryId, v.CategoryId, v.ProductId)
-			} else {
-				fmt.Println(v.SubCategoryId, v.CategoryId, v.ProductId)
-			}
-		}
-
+		//############# Crawl detail ###################
 		endpointDetailRepo := dto.EndpointDetailRepo{}
 		endpointDetailRepo.ConvertFrom(productDtoRepo)
-		// //SAve to cache, for crawl detail later
-		// for _, detailEndpoint := range endpointDetailRepo.Endpoints {
-		// 	//Call detail
-		// 	fmt.Println(detailEndpoint.Endpoint)
-		// }
+		//SAve to cache, for crawl detail later
+		for _, detailEndpoint := range endpointDetailRepo.Endpoints {
+			//Call detail product
+			err := CrawlProductDetail(detailEndpoint)
+			if err != nil {
+				log.Println(log.LogLevelDebug, "service/review/crawl/revain/crawl_products_info/go/CrawlProductsInfoByProductType/CrawlProdcutDetail", err.Error())
+				continue
+			}
+
+			err = CrawlProductReviews(detailEndpoint)
+			if err != nil {
+				log.Println(log.LogLevelDebug, "service/review/crawl/revain/crawl_products_info/go/CrawlProductsInfoByProductType/CrawlProdcutReviews", err.Error())
+				continue
+			}
+		}
 
 	}
 }
 
-func getProductsInfoUrlFromProductTypeName(endpointProductInfo string, pageIdx int) string {
-	params := fmt.Sprintf(_urlQueryParams, pageIdx) //bind data value to url param(s)
+func getProductsInfoUrlFromEndpoint(endpointProductInfo string, pageIdx int) string {
+	params := fmt.Sprintf(_urlQueryParamsProductsInfo, pageIdx) //bind data value to url param(s)
 	url := (_baseUrl + endpointProductInfo + params)
 	return url
 }

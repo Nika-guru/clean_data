@@ -21,7 +21,7 @@ DB_HOST: "127.0.0.1" #"139.180.152.195"
 DB_PORT: "5432"
 DB_USER: "postgres"
 DB_PASSWORD: "password"
-DB_NAME: "review_service"
+DB_NAME: "nika_review_data"
 
 
 # Log config : ABSOLUTE PATH

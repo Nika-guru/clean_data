@@ -26,13 +26,30 @@ type Product struct {
 
 func (repo *ProductRepo) InsertDB() {
 	for _, product := range repo.Products {
-		err := product.InsertDB()
-		if err != nil {
-			//TODO: insert fail success + sleep
-			log.Println(log.LogLevelDebug, `service/reivew/model/dao/product_info.go/func (repo *ProductInfoRepo) InsertDB()/ productInfo.InsertDB()`, err.Error())
-			continue
+		if !product.IsExist() {
+			err := product.InsertDB()
+			if err != nil {
+				log.Println(log.LogLevelDebug, `service/reivew/model/dao/product_info.go/func (repo *ProductInfoRepo) InsertDB()/ productInfo.InsertDB()`, err.Error())
+				continue
+			}
 		}
 	}
+}
+
+func (product *Product) IsExist() bool {
+	query := `
+		SELECT *
+		FROM product
+		WHERE productname = $1 AND productimage = $2 AND crawlsource = $3;
+	`
+	rows, err := db.PSQL.Query(query,
+		product.ProductName, product.ProductImage, product.CrawlSource)
+	if err != nil {
+		return false
+	}
+	defer rows.Close()
+
+	return rows.Next()
 }
 
 func (product *Product) InsertDB() error {
@@ -78,6 +95,25 @@ func (daoRepo *ProductRepo) ConverFrom(dtoRepo *dto.ProductInfoRepo) {
 		productDto.ProductId = &productDao.ProductId
 		daoRepo.Products = append(daoRepo.Products, productDao)
 	}
+}
+
+func (dao *Product) ConvertFrom(dto dto.ProductDetail) {
+	dao.ProductId = dto.ProductId
+	dao.ProductDescription = dto.Description
+}
+
+func (dao *Product) UpdateDescription() error {
+	query := `
+	UPDATE product
+		SET productdescription=$1
+		WHERE productid = $2
+	`
+	_, err := db.PSQL.Exec(query, dao.ProductDescription, dao.ProductId)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
