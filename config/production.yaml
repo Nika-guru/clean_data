@@ -1,6 +1,6 @@
 ## Server Configuration
 SERVER_NAME: "base"
-SERVER_IP: "127.0.0.1"
+SERVER_IP: "0.0.0.0" # DEFAULT 
 SERVER_PORT: "8000"
 SERVER_STORE_PATH: "./config/stores"
 SERVER_UPLOAD_PATH: "./config/uploads"
@@ -19,18 +19,16 @@ CRYPT_PUBLIC_KEY_FILE: "./config/keys/public.key"
 DB_DRIVER: "postgres"
 DB_HOST: "127.0.0.1"
 DB_PORT: "5432"
-DB_USER: "user"
+DB_USER: "postgres"
 DB_PASSWORD: "password"
-DB_NAME: "users"
+DB_NAME: "postgres"
 
 
-# DB_DRIVER: "mysql"
-# DB_HOST: "127.0.0.1"
-# DB_PORT: "3000"
-# DB_USER: "user"
-# DB_PASSWORD: "password"
-# DB_NAME: "db"
+# Log config : ABSOLUTE PATH
+LOG_OUTPUT : "/home/BACKEND/base-service.log"   # IF COMMENT : LOG_OUTPUT = CONSOLE
 
+# /home/BACKEND/base-service.log
+# AWS S3 Configuration 
 
 # DB_DRIVER: "mongo"
 # DB_HOST: "127.0.0.1"
@@ -39,7 +37,7 @@ DB_NAME: "users"
 # DB_PASSWORD: "password"
 # DB_NAME: "db"
 
-## Cache Configuration
+# Cache Configuration
 # CACHE_DRIVER: "redis"
 # CACHE_HOST: "127.0.0.1"
 # CACHE_PORT: "6379"
@@ -47,13 +45,13 @@ DB_NAME: "users"
 # CACHE_NAME: 0
 
 ## Local Cache Configuration
-LOCAL_CACHE_LIB: "ristretto"
-LOCAL_CACHE_MAX_COST: 1073741824 #maximum cost of cache (1GB = 2 ^ 30 bits)
-LOCAL_CACHE_NUM_COUNTERS: 1e7 #number of keys to track frequency of items (10 milions)
-LOCAL_CACHE_BUFFER_ITEMS: 64 #number of keys per get buffer
-LOCAL_CACHE_METRICS: true #show statistics
+# LOCAL_CACHE_LIB: "ristretto"
+# LOCAL_CACHE_MAX_COST: 1073741824 #maximum cost of cache (1GB = 2 ^ 30 bits)
+# LOCAL_CACHE_NUM_COUNTERS: 1e7 #number of keys to track frequency of items (10 milions)
+# LOCAL_CACHE_BUFFER_ITEMS: 64 #number of keys per get buffer
+# LOCAL_CACHE_METRICS: true #show statistics
 
-## Storage Configuration
+# Storage Configuration
 # STORAGE_DRIVER: "minio"
 # STORAGE_USE_SSL: true
 # STORAGE_ENDPOINT: ""

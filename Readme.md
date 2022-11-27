@@ -97,6 +97,10 @@ Chứa các thông tin config của dự án, các key, biến môi trường ph
 
 Sắp tới đây thì folder **pkg** này không đủ cho việc có thêm các tiện ích được build sẵn để sử dụng cho mục **service** như **cache, kafka, email, crypto ** mong mọi người đóng góp, nhận xét, nâng cấp **code-base** tốt hơn nữa. 
 
+
+## LOG 
+Có thể chọn cơ chế xem log ở file hay là log ra console bằng cách sửa ở file .yaml 
+
 ## Run with Docker 
 1. docker compose up 
 2. docker compose stop

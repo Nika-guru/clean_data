@@ -115,10 +115,9 @@ func configLoadValues() {
 	Config.SetDefault("CRYPT_PUBLIC_KEY_FILE", "./config/keys/public.key")
 
 	// JWT Expiration Time Value
-	Config.SetDefault("JWT_EXPIRATION_TIME_HOURS", 24)
+	Config.SetDefault("JWT_EXPIRATION_TIME_HOURS", 96)
 
 	// CONFIG DEFAULT : CONSOLE
 	Config.SetDefault("LOG_OUTPUT", "CONSOLE")
-	ServerCfg.Port = Config.GetString("LOG_OUTPUT")
 
 }
