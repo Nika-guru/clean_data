@@ -140,7 +140,7 @@ create index idx_product_statistic_totalUsed on product_statistic using btree(to
 create table product_raw_category(
 	productId bigint not null,
 	prodcutCategories varchar
-)
+);
 
 
 ------------------------------remove all data in all table

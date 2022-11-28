@@ -1,18 +1,19 @@
-package crawl
+package crawl_revain
 
 import (
 	"fmt"
 	"review-service/pkg/log"
+	"review-service/pkg/utils"
 	dto "review-service/service/review/model/dto/revain"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
 func CrawlProductReviewsByPage(endpointDetail dto.EndpointDetail) error {
-	for pageIdx := 1; pageIdx < 2; pageIdx++ {
+	for pageIdx := 1; ; pageIdx++ {
 		url := getProductReviewsUrlFromEndpoint(endpointDetail.Endpoint, pageIdx)
 
-		dom, err := GetHtmlDomByUrl(url)
+		dom, err := utils.GetHtmlDomByUrl(url)
 		if err != nil {
 			log.Println(log.LogLevelError, `review/crawl/revain/crawl_products_info.go/CrawlProductReviews/GetHtmlDomByUrl`, err.Error())
 		}
@@ -38,20 +39,20 @@ func getProductReviewsUrlFromEndpoint(endpointProductInfo string, pageIdx int) s
 func extractProductReviewsByHtmlDom(dom *goquery.Document, endpointDetail dto.EndpointDetail) dto.ProductReviewRepo {
 	productReviewRepo := dto.ProductReviewRepo{}
 
-	domKey := `main` + ConvertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 khpoB`)
+	domKey := `main` + utils.ConvertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 khpoB`)
 	dom.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
 		//header(review, name, image ...)
-		domKey := `div` + ConvertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Flex-sc-1mngh6p-1 bnwXZr`)
+		domKey := `div` + utils.ConvertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Flex-sc-1mngh6p-1 bnwXZr`)
 		s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
-			domKey := `img` + ConvertClassesFormatFromBrowserToGoQuery(`LazyImage-sc-synjzy-0 ReviewTargetLogo__Logo-sc-160quaj-0 HAIBu gWKbJj`)
+			domKey := `img` + utils.ConvertClassesFormatFromBrowserToGoQuery(`LazyImage-sc-synjzy-0 ReviewTargetLogo__Logo-sc-160quaj-0 HAIBu gWKbJj`)
 			s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 				// val, ok := s.Attr(`data-src`)
 				// fmt.Println("imageurl===", val, ok)
 			})
 
-			domKey = `div` + ConvertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 gmjrOf`)
+			domKey = `div` + utils.ConvertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 gmjrOf`)
 			s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 				// fmt.Println("=====rating", s.Text())
 			})
@@ -59,10 +60,10 @@ func extractProductReviewsByHtmlDom(dom *goquery.Document, endpointDetail dto.En
 		})
 
 		//footer(review)
-		domKey = `article` + ConvertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Grid-sc-1mngh6p-2 Review__ReviewCard-sc-1xpzhiw-0 iQbXxL cDlhpG`)
+		domKey = `article` + utils.ConvertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Grid-sc-1mngh6p-2 Review__ReviewCard-sc-1xpzhiw-0 iQbXxL cDlhpG`)
 		s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
-			domKey = `a` + ConvertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 Anchor-sc-1oa4wrg-0 kKJEOJ dDxbNj`)
+			domKey = `a` + utils.ConvertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 Anchor-sc-1oa4wrg-0 kKJEOJ dDxbNj`)
 			s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 				endpointReview, foundEndpoint := s.Attr(`href`)
 				if foundEndpoint {

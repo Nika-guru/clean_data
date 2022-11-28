@@ -1,4 +1,4 @@
-package dto
+package dto_revain
 
 type EndpointDetailRepo struct {
 	Endpoints []EndpointDetail

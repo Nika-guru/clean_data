@@ -1,8 +1,9 @@
-package crawl
+package crawl_revain
 
 import (
 	"encoding/json"
 	"review-service/pkg/log"
+	"review-service/pkg/utils"
 	"review-service/service/review/model/dao"
 	dto "review-service/service/review/model/dto/revain"
 
@@ -12,7 +13,7 @@ import (
 func CrawlProductDetail(endpoint dto.EndpointDetail) error {
 	url := getProductDetailUrlFromEndpoint(endpoint.Endpoint)
 
-	dom, err := GetHtmlDomByUrl(url)
+	dom, err := utils.GetHtmlDomByUrl(url)
 	if err != nil {
 		log.Println(log.LogLevelError, `review/crawl/revain/crawl_products_detail.go/CrawlProdcutDetail/GetHtmlDomByUrl`, err.Error())
 	}

@@ -1,11 +1,12 @@
-package crawl
+package crawl_revain
 
 import (
 	"fmt"
 	"review-service/pkg/log"
+	"review-service/pkg/utils"
 	"review-service/service/constant"
 	"review-service/service/review/model/dao"
-	dto "review-service/service/review/model/dto/revain"
+	dto_revain "review-service/service/review/model/dto/revain"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -20,10 +21,10 @@ func CrawlProductsInfo() {
 }
 
 func CrawlProductsInfoByProductType(endpointProductInfo string) {
-	for pageIdx := 1; pageIdx < 2; pageIdx++ {
+	for pageIdx := 1; ; pageIdx++ {
 		url := getProductsInfoUrlFromEndpoint(endpointProductInfo, pageIdx)
 
-		dom, err := GetHtmlDomByUrl(url)
+		dom, err := utils.GetHtmlDomByUrl(url)
 		if err != nil {
 			log.Println(log.LogLevelError, `review/crawl/revain/crawl_products_info.go/CrawlProductsInfoByProductType/GetHtmlDomByUrl`, err.Error())
 		}
@@ -34,7 +35,7 @@ func CrawlProductsInfoByProductType(endpointProductInfo string) {
 		}
 
 		productInfoList := extractProductsInfoByHtmlDom(dom, url)
-		productDtoRepo := &dto.ProductInfoRepo{}
+		productDtoRepo := &dto_revain.ProductInfoRepo{}
 		productDtoRepo.Products = productInfoList
 		productDaoRepo := dao.ProductRepo{}
 		productDaoRepo.ConverFrom(productDtoRepo)
@@ -45,7 +46,7 @@ func CrawlProductsInfoByProductType(endpointProductInfo string) {
 		productCategoryDaoRepo.InsertDB()
 
 		//############# Crawl detail ###################
-		endpointDetailRepo := dto.EndpointDetailRepo{}
+		endpointDetailRepo := dto_revain.EndpointDetailRepo{}
 		endpointDetailRepo.ConvertFrom(productDtoRepo)
 
 		maxGoroutines := 10
@@ -54,7 +55,7 @@ func CrawlProductsInfoByProductType(endpointProductInfo string) {
 		//SAve to cache, for crawl detail later
 		for index, detailEndpoint := range endpointDetailRepo.Endpoints {
 			guard <- struct{}{} // would block if guard channel is already filled
-			go func(detailEndpoint dto.EndpointDetail, index int) {
+			go func(detailEndpoint dto_revain.EndpointDetail, index int) {
 				fmt.Println(`start index`, index)
 
 				//Call detail product
@@ -85,16 +86,16 @@ func getProductsInfoUrlFromEndpoint(endpointProductInfo string, pageIdx int) str
 	return url
 }
 
-func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []*dto.ProductInfo {
-	products := make([]*dto.ProductInfo, 0)
+func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []*dto_revain.ProductInfo {
+	products := make([]*dto_revain.ProductInfo, 0)
 
-	domKey := `div` + ConvertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Grid-sc-1mngh6p-2 dzjLTP`)
+	domKey := `div` + utils.ConvertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Grid-sc-1mngh6p-2 dzjLTP`)
 	dom.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
-		domKey = `div` + ConvertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Flex-sc-1mngh6p-1 ReviewTargetCard__Card-sc-qbvmhm-0 jMDOvK kHppZh`)
+		domKey = `div` + utils.ConvertClassesFormatFromBrowserToGoQuery(`Box-sc-1mngh6p-0 Box__Flex-sc-1mngh6p-1 ReviewTargetCard__Card-sc-qbvmhm-0 jMDOvK kHppZh`)
 		s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
-			product := &dto.ProductInfo{}
+			product := &dto_revain.ProductInfo{}
 			product.CrawlSource = currentUrl
 
 			domKey = `img`
@@ -108,7 +109,7 @@ func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []*d
 
 			})
 
-			domKey = `a` + ConvertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 Anchor-sc-1oa4wrg-0 gtFTPK gOcOhU`)
+			domKey = `a` + utils.ConvertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 Anchor-sc-1oa4wrg-0 gtFTPK gOcOhU`)
 			s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
 				attrKey := `href`
@@ -122,7 +123,7 @@ func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []*d
 
 			})
 
-			domKey = `div` + ConvertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 bkUBKu`)
+			domKey = `div` + utils.ConvertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 bkUBKu`)
 			typeNames := ``
 			s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
@@ -135,7 +136,7 @@ func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []*d
 			typeNameArr := strings.Split(strings.Trim(typeNames, " "), `,`)
 			product.ProductCategories = typeNameArr
 
-			domKey = `p` + ConvertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 ReviewTargetCard__LineClamp-sc-qbvmhm-1 ReviewTargetCard___StyledLineClamp-sc-qbvmhm-2 jVbmuR dUpQvL dxYXvO`)
+			domKey = `p` + utils.ConvertClassesFormatFromBrowserToGoQuery(`Text-sc-kh4piv-0 ReviewTargetCard__LineClamp-sc-qbvmhm-1 ReviewTargetCard___StyledLineClamp-sc-qbvmhm-2 jVbmuR dUpQvL dxYXvO`)
 			s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
 				shortDescription := s.Text()

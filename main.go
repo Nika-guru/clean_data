@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"review-service/pkg/utils"
-	crawl "review-service/service/review/crawl/revain"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -20,7 +19,7 @@ const (
 
 func main() {
 	fmt.Println(`start`)
-	testCrawlReply()
+	// testCrawlReply()
 	fmt.Println(`end`)
 }
 
@@ -74,7 +73,7 @@ func testCrawlReply() error {
 }
 
 func testCrawlReview() {
-	dom, err := crawl.GetHtmlDomByUrl(`https://revain.org/projects/revain/review-8fc7d4bf-1d1d-4f06-95c5-9e48c732d10a`)
+	dom, err := utils.GetHtmlDomByUrl(`https://revain.org/projects/revain/review-8fc7d4bf-1d1d-4f06-95c5-9e48c732d10a`)
 	if err != nil {
 		log.Fatal(err)
 	}

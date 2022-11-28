@@ -12,7 +12,9 @@ import (
 	"review-service/pkg/db"
 	"review-service/pkg/router"
 	"review-service/pkg/server"
-	_ "review-service/service/review/crawl/revain"
+
+	// _ "review-service/service/review/crawl/revain"
+	_ "review-service/service/review/crawl/coingecko"
 
 	"review-service/service"
 )

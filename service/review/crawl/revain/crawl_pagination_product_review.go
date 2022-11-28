@@ -1,4 +1,4 @@
-package crawl
+package crawl_revain
 
 import (
 	"encoding/json"
@@ -15,7 +15,7 @@ import (
 func CrawlProductReviewsInCurrentPage(productReviewRepo dto.ProductReviewRepo) {
 	for _, productReview := range productReviewRepo.ProductReviews {
 		url := getProductReviewUrlFromEndpoint(productReview.Endpoint)
-		dom, err := GetHtmlDomByUrl(url)
+		dom, err := utils.GetHtmlDomByUrl(url)
 		if err != nil {
 			log.Println(log.LogLevelError, `review/crawl/revain/crawl_products_info.go/CrawlProductReview/GetHtmlDomByUrl`, err.Error())
 		}

@@ -1,4 +1,4 @@
-package dto
+package dto_revain
 
 type ProductInfoRepo struct {
 	Products []*ProductInfo
