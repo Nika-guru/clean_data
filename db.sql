@@ -143,3 +143,5 @@ create table product_raw_category(
 )
 
 
+------------------------------remove all data in all table
+truncate table account, account_reaction, category, product, product_category, product_contact, product_raw_category, product_statistic, reply, review, sub_category restart identity;

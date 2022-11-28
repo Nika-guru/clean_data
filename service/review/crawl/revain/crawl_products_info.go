@@ -15,10 +15,12 @@ func CrawlProductsInfo() {
 	for _, endpointProductInfo := range constant.ENDPOINTS_PRODUCT_INFO_REVAIN {
 		CrawlProductsInfoByProductType(endpointProductInfo)
 	}
+
+	log.Println(log.LogLevelInfo, `Crawl all from revain done`, `Crawl all from revain done`)
 }
 
 func CrawlProductsInfoByProductType(endpointProductInfo string) {
-	for pageIdx := 1; ; pageIdx++ {
+	for pageIdx := 1; pageIdx < 2; pageIdx++ {
 		url := getProductsInfoUrlFromEndpoint(endpointProductInfo, pageIdx)
 
 		dom, err := GetHtmlDomByUrl(url)
@@ -45,10 +47,16 @@ func CrawlProductsInfoByProductType(endpointProductInfo string) {
 		//############# Crawl detail ###################
 		endpointDetailRepo := dto.EndpointDetailRepo{}
 		endpointDetailRepo.ConvertFrom(productDtoRepo)
+
+		maxGoroutines := 10
+		guard := make(chan struct{}, maxGoroutines)
+
 		//SAve to cache, for crawl detail later
-		for _, detailEndpoint := range endpointDetailRepo.Endpoints {
-			//TODO: limit thread here
-			go func(detailEndpoint dto.EndpointDetail) {
+		for index, detailEndpoint := range endpointDetailRepo.Endpoints {
+			guard <- struct{}{} // would block if guard channel is already filled
+			go func(detailEndpoint dto.EndpointDetail, index int) {
+				fmt.Println(`start index`, index)
+
 				//Call detail product
 				err := CrawlProductDetail(detailEndpoint)
 				if err != nil {
@@ -61,9 +69,13 @@ func CrawlProductsInfoByProductType(endpointProductInfo string) {
 					log.Println(log.LogLevelDebug, "service/review/crawl/revain/crawl_products_info/go/CrawlProductsInfoByProductType/CrawlProdcutReviews", err.Error())
 					// continue
 				}
-			}(detailEndpoint)
+
+				fmt.Println(`end index`, index)
+				<-guard
+			}(detailEndpoint, index)
 
 		}
+
 	}
 }
 

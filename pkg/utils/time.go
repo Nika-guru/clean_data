@@ -9,3 +9,7 @@ func Timestamp() string {
 func StringToTimestamp(timestamp string) (time.Time, error) {
 	return time.Parse("2006-01-02T15:04:05Z", timestamp)
 }
+
+func TimestampToString(timestamp time.Time) string {
+	return timestamp.Format("2006-01-02T15:04:05.000Z")
+}
