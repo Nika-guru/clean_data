@@ -1,20 +1,17 @@
 package crawl_coingecko
 
 import (
-	"fmt"
 	"review-service/pkg/log"
 	"review-service/pkg/utils"
+	"review-service/service/constant"
+	"review-service/service/review/model/dao"
 	dto_coingecko "review-service/service/review/model/dto/coingecko"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
 func CrawlProductCategories() {
-	dom, err := utils.GetHtmlDomByUrl(`https://www.coingecko.com/en/categories`)
-
-	if err != nil {
-		log.Println(log.LogLevelError, `service/review/crawl/coingecko/crawl_category.go/CrawlProductCategories/GetHtmlDomByUrl`, err.Error())
-	}
+	dom := utils.GetHtmlDomByUrl(`https://www.coingecko.com/en/categories`)
 
 	//reponse not equal 200(404 --> No data to crawl)
 	if dom == nil {
@@ -25,28 +22,103 @@ func CrawlProductCategories() {
 
 	maxGoroutines := 10
 	guard := make(chan struct{}, maxGoroutines)
+	endpointCategories = endpointCategories[0:2]
 	routineCount := len(endpointCategories)
-	done := make(chan struct{}, routineCount)
+	done := make(chan int, routineCount)
 
-	for _, endpointCategory := range endpointCategories {
+	for index, endpointCategory := range endpointCategories {
 		guard <- struct{}{} //buffered channel, full capacity, wait here --> limit go routine
 
-		go func(endpointCategory *dto_coingecko.EndpointCategory) {
+		go func(endpointCategory *dto_coingecko.EndpointCategory, index int) {
 
 			CrawlProductIdByCategory(endpointCategory) //after run here, data updated, list coinId
 
 			<-guard
-			done <- struct{}{}
-		}(endpointCategory)
+			done <- index
+		}(endpointCategory, index)
 	}
 
 	//Wait all go routine done
 	for i := 0; i < len(endpointCategories); i++ {
-		<-done
+		index := <-done
+
+		//Data here
+		// fmt.Println(endpointCategories[index].CategoryName, endpointCategories[index].CoinIdList)
+		// fmt.Println(index, i, `================================================================`)
+
+		//################ Insert not duplicated default category #################
+		category := dao.Category{
+			CategoryName: constant.DEFAULT_CATEGORY_PRODUCT_REVAIN,
+		}
+		isExist, err := category.SelectByName()
+		if err != nil {
+			log.Println(log.LogLevelError, `service/review/crawl/coingecko/crawl_category.go/CrawlProductCategories/category.SelectByName()`, err.Error())
+			return
+		}
+
+		if !isExist {
+			err = category.InsertDB()
+			if err != nil {
+				log.Println(log.LogLevelError, `service/review/crawl/coingecko/crawl_category.go/CrawlProductCategories/category.InsertDB()`, err.Error())
+				return
+			}
+		}
+
+		endpointCategory := endpointCategories[index]
+
+		//################ Insert not duplicated sub category #################
+		subcategory := dao.SubCategory{
+			CategoryId:      category.CategoryId,
+			SubCategoryName: endpointCategory.CategoryName,
+		}
+		isExist, err = subcategory.SelectByName()
+		if err != nil {
+			log.Println(log.LogLevelError, `service/review/crawl/coingecko/crawl_category.go/CrawlProductCategories/subcategory.SelectByName()`, err.Error())
+			return
+		}
+		if !isExist {
+			err = subcategory.InsertDB()
+			if err != nil {
+				log.Println(log.LogLevelError, `service/review/crawl/coingecko/crawl_category.go/CrawlProductCategories/subcategory.InsertDB()`, err.Error())
+				return
+			}
+		}
+
+		for _, coinId := range endpointCategory.CoinIdList {
+			//################ Insert not duplicated product name #################
+			product := dao.Product{
+				ProductName: coinId,
+			}
+			isExist, err = product.SelectByProductName()
+			if err != nil {
+				log.Println(log.LogLevelError, `service/review/crawl/coingecko/crawl_category.go/CrawlProductCategories/product.SelectByProductName()`, err.Error())
+				continue
+			}
+			if !isExist {
+				err = product.InsertDB()
+				if err != nil {
+					log.Println(log.LogLevelError, `service/review/crawl/coingecko/crawl_category.go/CrawlProductCategories/product.InsertDB()`, err.Error())
+					continue
+				}
+			}
+
+			productCategory := dao.ProductCategory{
+				CategoryId:    category.CategoryId,
+				SubCategoryId: &subcategory.SubCategoryId,
+				ProductId:     product.ProductId,
+			}
+			err = productCategory.InsertDB()
+			if err != nil {
+				log.Println(log.LogLevelError, `service/review/crawl/coingecko/crawl_category.go/CrawlProductCategories/productCategory.InsertDB()`, err.Error())
+				continue
+			} else {
+				// fmt.Println(`run here`)
+			}
+
+		}
+
 	}
 
-	//Data here
-	fmt.Println(endpointCategories[0].CategoryName, endpointCategories[0].CoinIdList)
 }
 
 func extractCategoryByHtmlDom(dom *goquery.Document) []*dto_coingecko.EndpointCategory {

@@ -2,7 +2,6 @@ package crawl_coingecko
 
 import (
 	"fmt"
-	"review-service/pkg/log"
 	"review-service/pkg/utils"
 	dto_coingecko "review-service/service/review/model/dto/coingecko"
 	"strings"
@@ -11,23 +10,28 @@ import (
 )
 
 func CrawlProductIdByCategory(endpointCategory *dto_coingecko.EndpointCategory) {
-	for pageIdx := 1; pageIdx < 2; pageIdx++ {
+	for pageIdx := 1; ; pageIdx++ {
 		url := getUrlProductIdByCategory(endpointCategory.Endpoint, pageIdx)
-		dom, err := utils.GetHtmlDomByUrl(url)
+		dom := utils.GetHtmlDomByUrl(url)
 
-		if err != nil {
-			log.Println(log.LogLevelError, `review/crawl/coingecko/crawl_coin_info.go/CrawlProductNameById/GetHtmlDomByUrl`, err.Error())
-		}
-
-		//TODO: check by another way
-		//reponse not equal 200(404 --> No data to crawl)
-		if dom == nil {
-			return
+		//reponse not have data (table)
+		if !IsExistCoinByDom(dom) {
+			break
 		}
 
 		data := extractProductIdByHtmlDom(dom)
-		endpointCategory.CoinIdList = data
+		endpointCategory.CoinIdList = append(endpointCategory.CoinIdList, data...)
 	}
+}
+
+func IsExistCoinByDom(dom *goquery.Document) bool {
+	domKey := `div` + utils.ConvertClassesFormatFromBrowserToGoQuery(`coingecko-table`)
+
+	isExist := false
+	dom.Find(domKey).Each(func(i int, s *goquery.Selection) {
+		isExist = true
+	})
+	return isExist
 }
 
 func getUrlProductIdByCategory(endpoint string, pageIdx int) string {

@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"database/sql"
 	"review-service/pkg/db"
 	"review-service/pkg/log"
 	"review-service/pkg/utils"
@@ -50,7 +51,8 @@ func (daoRepo *ProductCategoryRepo) ConverFrom(dtoRepo *dto.ProductInfoRepo) err
 					{
 						err := category.InsertDB()
 						if err != nil {
-							continue
+							//continue
+							return err
 						}
 					}
 
@@ -93,7 +95,8 @@ func (daoRepo *ProductCategoryRepo) ConverFrom(dtoRepo *dto.ProductInfoRepo) err
 						}
 						err = subCategory.InsertDB()
 						if err != nil {
-							continue
+							//continue
+							return err
 						}
 					}
 					uniqueSubCategory[dtoProductCategory] = subCategory
@@ -113,12 +116,11 @@ func (daoRepo *ProductCategoryRepo) ConverFrom(dtoRepo *dto.ProductInfoRepo) err
 }
 
 func (daoRepo *ProductCategoryRepo) InsertDB() {
-	for _, product := range daoRepo.ProductCategories {
-		//product id equal 0, mean this product and its type is exist already in the database.
-		if product.ProductId != 0 && !product.IsExist() {
-			err := product.InsertDB()
+	for _, productCategory := range daoRepo.ProductCategories {
+		if !productCategory.IsExist() {
+			err := productCategory.InsertDB()
 			if err != nil {
-				log.Println(log.LogLevelDebug, `service/reivew/model/dao/product_category.go/func (daoRepo *ProductCategoryRepo) ConverFrom(dtoRepo *dto.ProductInfoRepo) error/ err := product.InsertDB()`, err.Error())
+				log.Println(log.LogLevelDebug, `service/reivew/model/dao/product_category.go/func (daoRepo *ProductCategoryRepo) InsertDB()/ err := productCategory.InsertDB()`, err.Error())
 				continue
 			}
 		}
@@ -148,11 +150,22 @@ func (dao *ProductCategory) InsertDB() error {
 func (productCategory *ProductCategory) IsExist() bool {
 	query := `
 		SELECT *
-		FROM product_category;
-		WHERE productid = $1 AND categoryid = $2 AND subcategoryid = $3;
+		FROM product_category
+		WHERE productid = $1 AND categoryid = $2 AND subcategoryid
 	`
-	rows, err := db.PSQL.Query(query,
-		productCategory.ProductId, productCategory.CategoryId, productCategory.SubCategoryId)
+
+	var rows *sql.Rows
+	var err error
+	if productCategory.SubCategoryId != nil {
+		query += ` = $3;`
+		rows, err = db.PSQL.Query(query,
+			productCategory.ProductId, productCategory.CategoryId, *productCategory.SubCategoryId)
+	} else {
+		query += ` IS NULL`
+		rows, err = db.PSQL.Query(query,
+			productCategory.ProductId, productCategory.CategoryId)
+	}
+
 	if err != nil {
 		return false
 	}

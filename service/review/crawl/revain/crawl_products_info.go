@@ -13,23 +13,26 @@ import (
 )
 
 func CrawlProductsInfo() {
+	log.Println(log.LogLevelInfo, `Start crawl revain`, `Start crawl revain`)
+
 	for _, endpointProductInfo := range constant.ENDPOINTS_PRODUCT_INFO_REVAIN {
+		log.Println(log.LogLevelInfo, `Start crawl revain/ endpoint `+endpointProductInfo, `Start crawl revain/ endpoint `+endpointProductInfo)
+
 		CrawlProductsInfoByProductType(endpointProductInfo)
+
+		log.Println(log.LogLevelInfo, `End crawl revain/ endpoint `+endpointProductInfo, `End crawl revain/ endpoint `+endpointProductInfo)
 	}
 
-	log.Println(log.LogLevelInfo, `Crawl all from revain done`, `Crawl all from revain done`)
+	log.Println(log.LogLevelInfo, `End crawl revain`, `End crawl revain`)
 }
 
 func CrawlProductsInfoByProductType(endpointProductInfo string) {
-	for pageIdx := 1; ; pageIdx++ {
+	for pageIdx := 1; pageIdx < 2; pageIdx++ {
 		url := getProductsInfoUrlFromEndpoint(endpointProductInfo, pageIdx)
 
-		dom, err := utils.GetHtmlDomByUrl(url)
-		if err != nil {
-			log.Println(log.LogLevelError, `review/crawl/revain/crawl_products_info.go/CrawlProductsInfoByProductType/GetHtmlDomByUrl`, err.Error())
-		}
+		dom := utils.GetHtmlDomByUrl(url)
 
-		//reponse not equal 200(404 --> No data to crawl)
+		//reponse not equal 200, 404(truy to call) --> No data to crawl
 		if dom == nil {
 			break
 		}
@@ -37,45 +40,52 @@ func CrawlProductsInfoByProductType(endpointProductInfo string) {
 		productInfoList := extractProductsInfoByHtmlDom(dom, url)
 		productDtoRepo := &dto_revain.ProductInfoRepo{}
 		productDtoRepo.Products = productInfoList
+
 		productDaoRepo := dao.ProductRepo{}
 		productDaoRepo.ConverFrom(productDtoRepo)
-		productDaoRepo.InsertDB() //insert finish --> has id incremental in model dao also dto
+		//insert finish --> has id incremental in model dao also dto
+		productDaoRepo.InsertDB(&dto_revain.ProductInfoDebug{
+			EndpointProduct: endpointProductInfo,
+			Url:             url,
+			PageIndex:       uint8(pageIdx),
+			IsSuccess:       false,
+		})
 
-		productCategoryDaoRepo := dao.ProductCategoryRepo{}
-		productCategoryDaoRepo.ConverFrom(productDtoRepo)
-		productCategoryDaoRepo.InsertDB()
+		CrawlMoreDetailData(productDtoRepo)
+	}
+}
 
-		//############# Crawl detail ###################
-		endpointDetailRepo := dto_revain.EndpointDetailRepo{}
-		endpointDetailRepo.ConvertFrom(productDtoRepo)
+func CrawlMoreDetailData(productDtoRepo *dto_revain.ProductInfoRepo) {
+	//############# Crawl detail and all its review ###################
+	productCategoryDaoRepo := dao.ProductCategoryRepo{}
+	productCategoryDaoRepo.ConverFrom(productDtoRepo)
+	productCategoryDaoRepo.InsertDB()
 
-		maxGoroutines := 10
-		guard := make(chan struct{}, maxGoroutines)
+	//############# Crawl detail and all its review ###################
+	endpointDetailRepo := dto_revain.EndpointDetailRepo{}
+	endpointDetailRepo.ConvertFrom(productDtoRepo)
 
-		//SAve to cache, for crawl detail later
-		for index, detailEndpoint := range endpointDetailRepo.Endpoints {
-			guard <- struct{}{} // would block if guard channel is already filled
-			go func(detailEndpoint dto_revain.EndpointDetail, index int) {
-				fmt.Println(`start index`, index)
+	maxGoroutines := 10
+	guard := make(chan struct{}, maxGoroutines)
 
-				//Call detail product
-				err := CrawlProductDetail(detailEndpoint)
-				if err != nil {
-					log.Println(log.LogLevelDebug, "service/review/crawl/revain/crawl_products_info/go/CrawlProductsInfoByProductType/CrawlProdcutDetail", err.Error())
-					// continue
-				}
+	//Crawl detail and review
+	for index, detailEndpoint := range endpointDetailRepo.Endpoints {
+		guard <- struct{}{} // would block if guard channel is already filled
+		go func(detailEndpoint dto_revain.EndpointDetail, index int) {
+			//Call detail product
+			err := CrawlProductDetail(detailEndpoint)
+			if err != nil {
+				log.Println(log.LogLevelDebug, "service/review/crawl/revain/crawl_products_info/go/CrawlProductsInfoByProductType/CrawlProdcutDetail", err.Error())
+				// continue
+			}
 
-				err = CrawlProductReviewsByPage(detailEndpoint)
-				if err != nil {
-					log.Println(log.LogLevelDebug, "service/review/crawl/revain/crawl_products_info/go/CrawlProductsInfoByProductType/CrawlProdcutReviews", err.Error())
-					// continue
-				}
-
-				fmt.Println(`end index`, index)
-				<-guard
-			}(detailEndpoint, index)
-
-		}
+			err = CrawlProductReviewsByPage(detailEndpoint)
+			if err != nil {
+				log.Println(log.LogLevelDebug, "service/review/crawl/revain/crawl_products_info/go/CrawlProductsInfoByProductType/CrawlProdcutReviews", err.Error())
+				// continue
+			}
+			<-guard
+		}(detailEndpoint, index)
 
 	}
 }
@@ -116,10 +126,13 @@ func extractProductsInfoByHtmlDom(dom *goquery.Document, currentUrl string) []*d
 				productDetailEndpoint, foundAttrVal := s.Attr(attrKey)
 				if foundAttrVal {
 					product.EndpointProductDetail = productDetailEndpoint
+
+					detailEndpointParts := strings.Split(productDetailEndpoint, `/`)
+					title := detailEndpointParts[len(detailEndpointParts)-1]
+					product.ProductName = title
 				}
 
-				title := s.Text()
-				product.ProductName = title
+				// productName := s.Text()
 
 			})
 

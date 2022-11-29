@@ -2,7 +2,6 @@ package crawl_revain
 
 import (
 	"encoding/json"
-	"review-service/pkg/log"
 	"review-service/pkg/utils"
 	"review-service/service/review/model/dao"
 	dto "review-service/service/review/model/dto/revain"
@@ -13,10 +12,7 @@ import (
 func CrawlProductDetail(endpoint dto.EndpointDetail) error {
 	url := getProductDetailUrlFromEndpoint(endpoint.Endpoint)
 
-	dom, err := utils.GetHtmlDomByUrl(url)
-	if err != nil {
-		log.Println(log.LogLevelError, `review/crawl/revain/crawl_products_detail.go/CrawlProdcutDetail/GetHtmlDomByUrl`, err.Error())
-	}
+	dom := utils.GetHtmlDomByUrl(url)
 
 	//reponse not equal 200(404 --> No data to crawl)
 	if dom == nil {
@@ -27,7 +23,7 @@ func CrawlProductDetail(endpoint dto.EndpointDetail) error {
 	dtoProductDetail.ProductId = endpoint.ProductId
 	daoProduct := dao.Product{}
 	daoProduct.ConvertFrom(dtoProductDetail)
-	err = daoProduct.UpdateDescription()
+	err := daoProduct.UpdateDescription()
 	if err != nil {
 		return err
 	}

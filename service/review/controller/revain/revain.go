@@ -1,13 +1,24 @@
-package controller
+package controller_revain
 
 import (
 	"fmt"
 	"net/http"
 	"review-service/pkg/router"
+	"review-service/service/constant"
 	"review-service/service/review/model/dao"
+	dto_revain "review-service/service/review/model/dto/revain"
 	"strconv"
 	"strings"
 )
+
+func GetProductInfoDebug(w http.ResponseWriter, r *http.Request) {
+	endpointLength := len(constant.ENDPOINTS_PRODUCT_INFO_REVAIN)
+	respMsg := fmt.Sprintf(`Get info coninfo-debug successfully (%d endpoint coin info)`, endpointLength)
+	debug := dto_revain.Debug{}
+	router.ResponseSuccessWithData(w, "200", respMsg, debug.GetProductInfo())
+}
+
+//////////////////////////////////////////////////////////
 
 type DefiInfo struct {
 	Image       string `json:"image"`

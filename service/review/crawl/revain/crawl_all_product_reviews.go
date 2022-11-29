@@ -2,7 +2,6 @@ package crawl_revain
 
 import (
 	"fmt"
-	"review-service/pkg/log"
 	"review-service/pkg/utils"
 	dto "review-service/service/review/model/dto/revain"
 
@@ -10,13 +9,10 @@ import (
 )
 
 func CrawlProductReviewsByPage(endpointDetail dto.EndpointDetail) error {
-	for pageIdx := 1; ; pageIdx++ {
+	for pageIdx := 1; pageIdx < 2; pageIdx++ {
 		url := getProductReviewsUrlFromEndpoint(endpointDetail.Endpoint, pageIdx)
 
-		dom, err := utils.GetHtmlDomByUrl(url)
-		if err != nil {
-			log.Println(log.LogLevelError, `review/crawl/revain/crawl_products_info.go/CrawlProductReviews/GetHtmlDomByUrl`, err.Error())
-		}
+		dom := utils.GetHtmlDomByUrl(url)
 
 		//reponse not equal 200(404 --> No data to crawl)
 		if dom == nil {

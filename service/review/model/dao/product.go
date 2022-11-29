@@ -7,6 +7,7 @@ import (
 	"review-service/pkg/log"
 	"review-service/pkg/utils"
 	dto "review-service/service/review/model/dto/revain"
+	dto_revain "review-service/service/review/model/dto/revain"
 )
 
 type ProductRepo struct {
@@ -24,32 +25,27 @@ type Product struct {
 	UpdatedDate        string         `json:"updated_date"`
 }
 
-func (repo *ProductRepo) InsertDB() {
+func (repo *ProductRepo) InsertDB(productInfoDebug *dto_revain.ProductInfoDebug) {
 	for _, product := range repo.Products {
-		if !product.IsExist() {
+		//Not exist, got existed id(incremental)
+		isExist, err := product.SelectByProductName()
+		if err != nil {
+			log.Println(log.LogLevelDebug, `service/reivew/model/dao/product.go/func (repo *ProductInfoRepo) InsertDB()/ product.SelectByProductName()`, err.Error())
+			continue
+		}
+		if !isExist {
 			err := product.InsertDB()
 			if err != nil {
 				log.Println(log.LogLevelDebug, `service/reivew/model/dao/product_info.go/func (repo *ProductInfoRepo) InsertDB()/ productInfo.InsertDB()`, err.Error())
 				continue
 			}
+			//######Start Debuging #########
+			debug := dto_revain.Debug{}
+			productInfoDebug.IsSuccess = true
+			debug.AddProductInfo(*productInfoDebug)
+			//######End Debuging #########
 		}
 	}
-}
-
-func (product *Product) IsExist() bool {
-	query := `
-		SELECT *
-		FROM product
-		WHERE productname = $1 AND productimage = $2 AND crawlsource = $3;
-	`
-	rows, err := db.PSQL.Query(query,
-		product.ProductName, product.ProductImage, product.CrawlSource)
-	if err != nil {
-		return false
-	}
-	defer rows.Close()
-
-	return rows.Next()
 }
 
 func (product *Product) InsertDB() error {
@@ -116,6 +112,41 @@ func (dao *Product) UpdateDescription() error {
 	return nil
 }
 
+func (dao *Product) SelectByProductName() (isExist bool, err error) {
+	query := `
+		SELECT DISTINCT ON(productname) 
+			productid, productname, productimage,
+			productdescription, productdetail, crawlsource,
+			createddate, updateddate
+		FROM product
+		WHERE productname = $1
+		ORDER BY productname, productid; --get smallest id if duplicate
+	`
+	rows, err := db.PSQL.Query(query, dao.ProductName)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		productDetailJSONB := []byte{}
+		err := rows.Scan(
+			&dao.ProductId, &dao.ProductName, &dao.ProductImage,
+			&dao.ProductDescription, &productDetailJSONB, &dao.CrawlSource,
+			&dao.CreatedDate, &dao.UpdatedDate)
+		if err != nil {
+			return true, err
+		}
+		json.Unmarshal(productDetailJSONB, &dao.ProductDetail)
+		if err != nil {
+			return true, err
+		}
+		return true, nil
+	}
+
+	return false, nil
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (repo *ProductRepo) SelectByTitleWithShortDescriptionAndType(keyword string, productTypeId int64) error {
@@ -166,4 +197,20 @@ func (repo *ProductRepo) SelectByTitleWithShortDescriptionAndType(keyword string
 	}
 
 	return nil
+}
+
+func (product *Product) IsExist() bool {
+	query := `
+		SELECT *
+		FROM product
+		WHERE productname = $1 AND productimage = $2 AND crawlsource = $3;
+	`
+	rows, err := db.PSQL.Query(query,
+		product.ProductName, product.ProductImage, product.CrawlSource)
+	if err != nil {
+		return false
+	}
+	defer rows.Close()
+
+	return rows.Next()
 }

@@ -15,10 +15,8 @@ import (
 func CrawlProductReviewsInCurrentPage(productReviewRepo dto.ProductReviewRepo) {
 	for _, productReview := range productReviewRepo.ProductReviews {
 		url := getProductReviewUrlFromEndpoint(productReview.Endpoint)
-		dom, err := utils.GetHtmlDomByUrl(url)
-		if err != nil {
-			log.Println(log.LogLevelError, `review/crawl/revain/crawl_products_info.go/CrawlProductReview/GetHtmlDomByUrl`, err.Error())
-		}
+
+		dom := utils.GetHtmlDomByUrl(url)
 
 		//reponse not equal 200(404 --> No data to crawl)
 		if dom == nil {
@@ -31,7 +29,7 @@ func CrawlProductReviewsInCurrentPage(productReviewRepo dto.ProductReviewRepo) {
 
 		account := dao.Account{}
 		account.ConvertFrom(*productReviewTmp)
-		err = account.InsertDB() //after insert have account id
+		err := account.InsertDB() //after insert have account id
 		if err != nil {
 			log.Println(log.LogLevelError, `service/review/crawl/revain/crawl_pagination_product_review.go/CrawlProductReviewsInCurrentPage/account.InsertDB()`, err.Error())
 		}
