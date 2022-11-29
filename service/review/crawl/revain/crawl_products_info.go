@@ -27,7 +27,7 @@ func CrawlProductsInfo() {
 }
 
 func CrawlProductsInfoByProductType(endpointProductInfo string) {
-	for pageIdx := 1; pageIdx < 2; pageIdx++ {
+	for pageIdx := 1; ; pageIdx++ {
 		url := getProductsInfoUrlFromEndpoint(endpointProductInfo, pageIdx)
 
 		dom := utils.GetHtmlDomByUrl(url)

@@ -9,7 +9,7 @@ import (
 )
 
 func CrawlProductReviewsByPage(endpointDetail dto.EndpointDetail) error {
-	for pageIdx := 1; pageIdx < 2; pageIdx++ {
+	for pageIdx := 1; ; pageIdx++ {
 		url := getProductReviewsUrlFromEndpoint(endpointDetail.Endpoint, pageIdx)
 
 		dom := utils.GetHtmlDomByUrl(url)
