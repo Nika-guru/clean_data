@@ -19,7 +19,6 @@ type ProductInfoDebug struct {
 	IsSuccess bool
 }
 
-//K - V in params
 func (dao *Debug) AddProductInfo(productInfoDebug ProductInfoDebug) {
 	data, foundCacheRevainProductInfo := cache.LocalCache.Get(constant.KEY_CACHE_REVAIN_PRODUCT_INFO)
 	if !foundCacheRevainProductInfo {
@@ -38,6 +37,12 @@ func (dao *Debug) GetProductInfo() map[string][]ProductInfoDebug {
 		return data.(map[string][]ProductInfoDebug)
 	}
 	return nil
+}
+
+// #################################################################
+
+// #################################################################
+type ProductDetailDebug struct {
 }
 
 // #################################################################

@@ -22,7 +22,6 @@ func CrawlProductCategories() {
 
 	maxGoroutines := 10
 	guard := make(chan struct{}, maxGoroutines)
-	endpointCategories = endpointCategories[0:2]
 	routineCount := len(endpointCategories)
 	done := make(chan int, routineCount)
 

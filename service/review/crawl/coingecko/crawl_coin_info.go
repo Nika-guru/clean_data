@@ -10,7 +10,7 @@ import (
 )
 
 func CrawlProductIdByCategory(endpointCategory *dto_coingecko.EndpointCategory) {
-	for pageIdx := 1; ; pageIdx++ {
+	for pageIdx := 1; pageIdx < 3; pageIdx++ {
 		url := getUrlProductIdByCategory(endpointCategory.Endpoint, pageIdx)
 		dom := utils.GetHtmlDomByUrl(url)
 
@@ -21,6 +21,17 @@ func CrawlProductIdByCategory(endpointCategory *dto_coingecko.EndpointCategory) 
 
 		data := extractProductIdByHtmlDom(dom)
 		endpointCategory.CoinIdList = append(endpointCategory.CoinIdList, data...)
+
+		// #################################Start Debug #################################
+		debug := dto_coingecko.Debug{}
+		debug.AddProductCategory(dto_coingecko.ProductCategoryDebug{
+			CategoryName: endpointCategory.CategoryName,
+
+			Url:       url,
+			PageIndex: uint8(pageIdx),
+			IsSuccess: true,
+		})
+		// #################################End Debug #################################
 	}
 }
 
