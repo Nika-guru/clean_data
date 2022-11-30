@@ -10,7 +10,7 @@ import (
 )
 
 func CrawlProductIdByCategory(endpointCategory *dto_coingecko.EndpointCategory) {
-	for pageIdx := 1; pageIdx < 3; pageIdx++ {
+	for pageIdx := 1; ; pageIdx++ {
 		url := getUrlProductIdByCategory(endpointCategory.Endpoint, pageIdx)
 		dom := utils.GetHtmlDomByUrl(url)
 
