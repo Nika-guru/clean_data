@@ -9,4 +9,4 @@ SELECT create_distributed_table('product_statistic', 'productid');
 SELECT create_distributed_table('review', 'productid');
 SELECT create_distributed_table('reply', 'productid');
 SELECT create_distributed_table('account_reaction', 'productid');
-SELECT create_distributed_table('account', 'userid');
+SELECT create_reference_table('account', 'userid');
