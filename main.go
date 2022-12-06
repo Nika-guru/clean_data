@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"review-service/pkg/utils"
+	crawl_dappradar_dapp "review-service/service/review/crawl/dappradar_dapp"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -19,7 +20,8 @@ const (
 
 func main() {
 	fmt.Println(`start`)
-	// testCrawlReply()
+	dom := utils.GetHtmlDomJsRenderByUrl(`https://dappradar.com/ethereum/marketplaces/opensea`)
+	crawl_dappradar_dapp.CrawlDappDetailByHtmlDom(dom)
 	fmt.Println(`end`)
 }
 
@@ -70,15 +72,6 @@ func testCrawlReply() error {
 	fmt.Println(`content: `, reviewReplyRepo.Comments[0].Reactions[0].Reaction)
 
 	return err
-}
-
-func testCrawlReview() {
-	dom, err := utils.GetHtmlDomByUrl(`https://revain.org/projects/revain/review-8fc7d4bf-1d1d-4f06-95c5-9e48c732d10a`)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	extract(dom)
 }
 
 func extract(dom *goquery.Document) {

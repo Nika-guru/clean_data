@@ -1,4 +1,4 @@
-package crawl_revain
+package crawl_revain_category_productinfo_review_reply
 
 import (
 	"fmt"
@@ -32,7 +32,7 @@ func CrawlProductsInfoByProductType(endpointProductInfo string) {
 
 		dom := utils.GetHtmlDomByUrl(url)
 
-		//reponse not equal 200, 404(truy to call) --> No data to crawl
+		//reponse not equal 200, 404(try to call) --> No data to crawl
 		if dom == nil {
 			break
 		}

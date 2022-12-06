@@ -123,6 +123,8 @@ func (daoRepo *ProductCategoryRepo) InsertDB() {
 				log.Println(log.LogLevelDebug, `service/reivew/model/dao/product_category.go/func (daoRepo *ProductCategoryRepo) InsertDB()/ err := productCategory.InsertDB()`, err.Error())
 				continue
 			}
+
+			//ban bum bum
 		}
 	}
 }
@@ -144,6 +146,7 @@ func (dao *ProductCategory) InsertDB() error {
 	_, err := db.PSQL.Exec(query,
 		dao.ProductId, dao.CategoryId, dao.SubCategoryId,
 		dao.CreatedDate, dao.UpdatedDate)
+
 	return err
 }
 

@@ -5,14 +5,22 @@ import (
 	"review-service/service/index"
 	"review-service/service/review"
 
-	crawl_coingecko "review-service/service/review/crawl/coingecko"
-	// crawl_revain "review-service/service/review/crawl/revain"
+	//1
+	// crawl_coingecko_category "review-service/service/review/crawl/coingecko_category"
+	// crawl_revain_category_productinfo_review_reply "review-service/service/review/crawl/revain_category_productinfo_review_reply"
+
+	//2
+	crawl_dappradar_dapp "review-service/service/review/crawl/dappradar_dapp"
 )
 
 func init() {
 	go func() {
-		// crawl_revain.CrawlProductsInfo()
-		crawl_coingecko.CrawlProductCategories()
+		//1
+		// crawl_revain_category_productinfo_review_reply.Crawl()
+		// crawl_coingecko_category.Crawl()
+
+		//2
+		crawl_dappradar_dapp.Crawl()
 	}()
 }
 

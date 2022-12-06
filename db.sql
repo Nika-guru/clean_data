@@ -46,11 +46,11 @@ create index idx_reply_reviewId on reply using btree(reviewId); --get list
 drop table if exists account;
 create table account(
 	id bigserial not null,
-	userId bigint null,
-	role int8 null,
+	userId bigint null, --| -1 (updated)
+	role int8 null, --| 0: user
 	password varchar,
      image varchar null,
-	accountType varchar null, --facebook, twitter, github, ...
+	accountType varchar null, --'normal' --facebook, twitter, github, ...
 	email varchar null,
 	username varchar null,
 	createddate timestamp NOT NULL,
@@ -85,6 +85,7 @@ create table sub_category(
 	name varchar not null,
 	categoryId bigint not null
 );
+drop index if exists idx_sub_category_id;
 create index idx_sub_category_id on sub_category using hash(categoryId); --get list
 
 
@@ -98,6 +99,7 @@ create table product_category(
 	createdDate timestamp not null,
 	updatedDate timestamp not null
 );
+drop index if exists idx_product_category_product_id;
 create index idx_product_category_product_id on product_category using btree(productId); --get list
 
 
@@ -109,6 +111,7 @@ create table product_contact(
 	createdDate timestamp not null,
 	updatedDate timestamp not null
 );
+drop index if exists idx_product_contact_product_id;
 create index idx_product_contact_product_id on product_contact using btree(productId); --get list
 
 drop table if exists product_statistic;
@@ -128,20 +131,70 @@ create table product_statistic(
 	createdDate timestamp not null,
 	updatedDate timestamp not null
 );
+drop index if exists idx_product_statistic_product_id;
 create index idx_product_statistic_product_id on product_statistic using hash(productId); --get one
+drop index if exists idx_product_statistic_tvl;
 create index idx_product_statistic_tvl on product_statistic using btree(tvl); --sorting
+drop index if exists idx_product_statistic_price;
 create index idx_product_statistic_price on product_statistic using btree(price); --soring
+drop index if exists idx_product_statistic_holder;
 create index idx_product_statistic_holder on product_statistic using btree(holder); --soring
+drop index if exists idx_product_statistic_marketcap;
 create index idx_product_statistic_marketcap on product_statistic using btree(marketcap); --soring
+drop index if exists idx_product_statistic_volume;
 create index idx_product_statistic_volume on product_statistic using btree(volume); --soring
+drop index if exists idx_product_statistic_totalUsed;
 create index idx_product_statistic_totalUsed on product_statistic using btree(totalUsed); --soring
 
 
+drop table if exists blockchain;
+create table blockchain(
+	id bigserial not null,
+	blockchainId varchar null,
+	blockchainName varchar null,
+	info jsonb null,
+	createdDate timestamp not null,
+	updatedDate timestamp not null
+);
+ 
+drop table if exists product_blockchain;
+create table product_blockchain (
+	product_id bigint not null,
+	blockchain_id bigint not null,
+	createdDate timestamp not null,
+	updatedDate timestamp not null
+ );
+drop index if exists idx_product_blockchain_product_id;
+create index idx_product_blockchain_product_id on product_blockchain using btree(product_id); --get list
+drop index if exists idx_product_blockchain_blockchain_id;
+create index idx_product_blockchain_blockchain_id on product_blockchain using btree(blockchain_id); --get list
+ 
+
+create table tag(
+	id bigserial not null,
+	tagName varchar null,
+	createdDate timestamp not null,
+	updatedDate timestamp not null
+ )
+
+create table product_tag(
+	product_id bigint not null,
+	tag_id bigint not null,
+	createdDate timestamp not null,
+	updatedDate timestamp not null
+)
+drop index if exists idx_product_tag_product_id;
+create index idx_product_tag_product_id on product_tag using btree(product_id); --get list
+drop index if exists idx_product_tag_tag_id;
+create index idx_product_tag_tag_id on product_tag using btree(tag_id); --get list
+
+
+------------------------------remove all data in all table
+truncate table account, account_reaction, category, product, product_category, product_contact, product_raw_category, product_statistic, reply, review, sub_category, blockchain restart identity;
+
+
+drop table if exists product_raw_category;
 create table product_raw_category(
 	productId bigint not null,
 	prodcutCategories varchar
 );
-
-
-------------------------------remove all data in all table
-truncate table account, account_reaction, category, product, product_category, product_contact, product_raw_category, product_statistic, reply, review, sub_category restart identity;

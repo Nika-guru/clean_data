@@ -1,4 +1,4 @@
-package crawl_coingecko
+package crawl_coingecko_category
 
 import (
 	"review-service/pkg/log"

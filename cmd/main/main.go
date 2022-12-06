@@ -14,7 +14,7 @@ import (
 	"review-service/pkg/server"
 
 	// _ "review-service/service/review/crawl/revain"
-	_ "review-service/service/review/crawl/coingecko"
+	// _ "review-service/service/review/crawl/coingecko"
 
 	"review-service/service"
 )
