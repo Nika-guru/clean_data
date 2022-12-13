@@ -5,11 +5,12 @@ type DetailDapp struct {
 	Image       string
 	ProductId   string
 	ProductName string
+	//From url
+	ChainName string
+	Category  string
 
-	//
-	BlockchainId string
-	CategoryId   string
-	Tags         []string
-	Description  string
-	Social       map[string]any
+	//Detail
+	SubCategories []string //tags
+	Description   string
+	Social        map[string]any //url, image
 }

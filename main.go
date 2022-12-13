@@ -7,7 +7,10 @@ import (
 	"log"
 	"net/http"
 	"review-service/pkg/utils"
-	crawl_dappradar_dapp "review-service/service/review/crawl/dappradar_dapp"
+
+	// crawl_top100token_token_info "review-service/service/review/crawl/top100token_token_info"
+	crawl_coincarp_investor "review-service/service/review/crawl/coincarp_investor"
+
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -19,10 +22,9 @@ const (
 )
 
 func main() {
-	fmt.Println(`start`)
-	dom := utils.GetHtmlDomJsRenderByUrl(`https://dappradar.com/ethereum/marketplaces/opensea`)
-	crawl_dappradar_dapp.CrawlDappDetailByHtmlDom(dom)
-	fmt.Println(`end`)
+	// dom := utils.GetHtmlDomByUrl(`https://www.coincarp.com/fundraising/earn-alliance-seed`)
+	// crawl_coincarp_investor.CrawlDescriptionAndAnnouncementByHtmlDom(dom, nil)
+	crawl_coincarp_investor.Crawl()
 }
 
 type ReviewReplyRepo struct {

@@ -119,5 +119,4 @@ func configLoadValues() {
 
 	// CONFIG DEFAULT : CONSOLE
 	Config.SetDefault("LOG_OUTPUT", "CONSOLE")
-
 }

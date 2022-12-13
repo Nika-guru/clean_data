@@ -198,3 +198,103 @@ create table product_raw_category(
 	productId bigint not null,
 	prodcutCategories varchar
 );
+
+
+-----------------------------raw data
+drop table if exists fund_raising;
+create table fund_raising(
+	projectCode varchar,
+	projectName varchar,
+	projectLogo varchar,
+	
+	investorCode varchar,
+	investorName varchar,
+	investorLogo varchar,
+
+	fundStageCode varchar,
+	fundStageName varchar,
+	fundAmount float8,
+	fundDate timestamp,
+
+	createdDate timestamp,
+	updatedDate timestamp,
+
+	description text,
+	announcementUrl varchar,
+	valulation float8,
+
+	srcFund varchar,
+	srcInvestor varchar
+)
+
+drop table if exists investor;
+create table investor(
+	investorCode varchar,
+	investorName varchar,
+	investorImage varchar,
+	categoryName varchar,
+	yearFounded int8,
+	location varchar,
+	socials json,
+	description text,
+	src varchar,
+	createddate timestamp NOT NULL,
+    updateddate timestamp NOT NULL
+);
+drop index if exists idx_investor_investor_code;
+create index idx_investor_investor_code on investor using btree(investorCode);
+drop index if exists idx_investor_investor_name;
+create index idx_investor_investor_name on investor using btree(investorName);
+
+
+
+drop table if exists project
+create table project (
+	id varchar, --code
+	name varchar,
+	category varchar,
+	subCategory varchar,
+	social json,
+	image varchar,
+	description varchar,
+	chainid varchar,
+    chainname varchar,
+	extradata json,
+    createddate timestamp NOT NULL,
+    updateddate timestamp NOT NULL
+) ;
+create index idx_project_productid on project using hash(id);
+
+
+drop table if exists coin;
+create table coin (
+    coinId varchar,
+	type varchar, --coin ^ token
+	
+	address varchar, --lower (NULL: 'NULL')
+	chainid varchar,
+    chainName varchar,
+	
+	symbol varchar, --upper
+	name varchar,
+	tag varchar, 
+	totalsupply varchar,
+	maxsupply varchar,
+	marketcap varchar,
+	volumetrading varchar,	
+
+	image varchar,
+	decimals int8, -- (NULL: 0)
+	src varchar,
+	detail json
+);
+drop index if exists idx_coin_address_address;
+create index idx_coin_address_address on coin using btree(address);
+drop index if exists idx_coin_address_symbol;
+create index idx_coin_address_symbol on coin using btree(symbol);
+drop index if exists idx_coin_address_name;
+create index idx_coin_address_name on coin using btree(name);
+drop index if exists idx_coin_address_chainid;
+create index idx_coin_address_chainid on coin using btree(chainid);
+
+

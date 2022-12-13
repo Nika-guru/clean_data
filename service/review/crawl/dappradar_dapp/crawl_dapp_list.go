@@ -19,16 +19,19 @@ func CrawlDappEndpointByHtmlDom(dom *goquery.Document) []dto_dappradar.EndpointD
 
 			domKey = `tr` + utils.ConvertClassesFormatFromBrowserToGoQuery(`sc-eJDSGI gKTXmp`)
 			s.Find(domKey).Each(func(i int, s *goquery.Selection) {
-				// fmt.Println(`run`)
 
 				isAd := false
-				domKey = `div` + utils.ConvertClassesFormatFromBrowserToGoQuery(`sc-gfbthv egscaG`)
+				domKey = `td` + utils.ConvertClassesFormatFromBrowserToGoQuery(`sc-oZIhv chGsPP`)
 				s.Find(domKey).Each(func(i int, s *goquery.Selection) {
+					domKey = `span`
+					s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
-					_txtAdDisplayHtml := `Ad`
-					if s.Text() == _txtAdDisplayHtml {
-						isAd = true
-					}
+						_txtAdDisplayHtml := `Ad`
+						if s.Text() == _txtAdDisplayHtml {
+							isAd = true
+						}
+
+					})
 
 				})
 
@@ -38,7 +41,7 @@ func CrawlDappEndpointByHtmlDom(dom *goquery.Document) []dto_dappradar.EndpointD
 					dtoEndpointDapp.DetailDapp = &dtoDetailDapp
 
 					//Image product
-					domKey = `div` + utils.ConvertClassesFormatFromBrowserToGoQuery(`sc-iAbQMe dBiXhX`)
+					domKey = `td` + utils.ConvertClassesFormatFromBrowserToGoQuery(`sc-oZIhv kBtEgu`)
 					s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
 						domKey := `img`
@@ -52,7 +55,7 @@ func CrawlDappEndpointByHtmlDom(dom *goquery.Document) []dto_dappradar.EndpointD
 					})
 
 					//Id, name product
-					domKey = `div` + utils.ConvertClassesFormatFromBrowserToGoQuery(`sc-hrDvXV bRkjlF`)
+					domKey = `td` + utils.ConvertClassesFormatFromBrowserToGoQuery(`sc-oZIhv chNICI`)
 					s.Find(domKey).Each(func(i int, s *goquery.Selection) {
 
 						domKey := `a`
@@ -68,10 +71,10 @@ func CrawlDappEndpointByHtmlDom(dom *goquery.Document) []dto_dappradar.EndpointD
 									dtoDetailDapp.ProductId = productId
 
 									productCategory := urlParts[2]
-									dtoDetailDapp.CategoryId = productCategory
+									dtoDetailDapp.Category = productCategory
 
 									productBlockchainId := urlParts[1]
-									dtoDetailDapp.BlockchainId = productBlockchainId
+									dtoDetailDapp.ChainName = productBlockchainId
 								}
 
 							}
