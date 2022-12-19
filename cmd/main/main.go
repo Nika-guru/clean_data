@@ -14,6 +14,7 @@ import (
 	"base/pkg/server"
 
 	"base/service"
+	_ "base/service/merge/logic"
 )
 
 // Server Variable

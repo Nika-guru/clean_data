@@ -17,15 +17,15 @@ CRYPT_PUBLIC_KEY_FILE: "./config/keys/public.key"
 ## Database Configuration
 
 DB_DRIVER: "postgres"
-DB_HOST: "127.0.0.1"
+DB_HOST: "18.181.188.61" #aws coordinator
 DB_PORT: "5432"
 DB_USER: "postgres"
-DB_PASSWORD: "password"
-DB_NAME: "postgres"
+DB_PASSWORD: "Nikae3b0c4422022@"
+DB_NAME: "gear5_data"
 
 
 # Log config : ABSOLUTE PATH
-LOG_OUTPUT : "/home/BACKEND/base-service.log"   # IF COMMENT : LOG_OUTPUT = CONSOLE
+# LOG_OUTPUT : "/home/BACKEND/base-service.log"   # IF COMMENT : LOG_OUTPUT = CONSOLE
 
 # /home/BACKEND/base-service.log
 # AWS S3 Configuration 
