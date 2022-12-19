@@ -2,9 +2,33 @@ package dao
 
 import "base/pkg/db"
 
+type ChainListRepo struct {
+	ChainLists []ChainList
+}
 type ChainList struct {
 	ChainId   string
 	ChainName string
+}
+
+func (repo *ChainListRepo) SelectAll() error {
+	query :=
+		`
+	SELECT chainid, chainname
+	FROM chain_list;	
+	`
+	rows, err := db.PSQL.Query(query)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		dao := ChainList{}
+		rows.Scan(&dao.ChainId, &dao.ChainName)
+		repo.ChainLists = append(repo.ChainLists, dao)
+	}
+
+	return nil
 }
 
 func (dao *ChainList) SelectChainNameByChainId() error {

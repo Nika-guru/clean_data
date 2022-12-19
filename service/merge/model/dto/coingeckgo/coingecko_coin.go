@@ -82,6 +82,13 @@ func (repo *CoingeckoCoinRepo) CrawlTokens() error {
 }
 
 func (repo *CoingeckoCoinRepo) ConvertTo(DAORepo *dao.CoinRepo) {
+	chainListRepo := dao.ChainListRepo{}
+	chainListRepo.SelectAll()
+	chainListMap := make(map[string]string)
+	for _, chainList := range chainListRepo.ChainLists {
+		chainListMap[chainList.ChainName] = chainList.ChainId
+	}
+
 	//########## Traverse each DTO ##########
 	for _, coingeckoCoin := range repo.CoingeckoCoins {
 		coingeckoCoinVal := coingeckoCoin
@@ -99,6 +106,7 @@ func (repo *CoingeckoCoinRepo) ConvertTo(DAORepo *dao.CoinRepo) {
 			coinDAO.Type = `coin`
 			//ChainName, TokenAddress will be NULL
 			coinDAO.ChainName = `NULL`
+			coinDAO.ChainId = `NULL`
 			coinDAO.TokenAddress = `NULL`
 		} else
 		//########## Token ##########
@@ -127,15 +135,13 @@ func (repo *CoingeckoCoinRepo) ConvertTo(DAORepo *dao.CoinRepo) {
 					tokenAddessVal = tokenAddess.(string)
 				}
 
-				chainList := dao.ChainList{}
-				chainList.ChainName = chainNameVal
-				chainList.SelectChainIdByChainName()
+				chainId, foundChainId := chainListMap[chainNameVal]
 				//###########################  ChainId #########################
 				chainIdVal := ``
-				if chainList.ChainId == `` {
+				if !foundChainId {
 					chainIdVal = `NULL` //Non-EVM, or unkown chain
 				} else {
-					chainIdVal = chainList.ChainId
+					chainIdVal = chainId
 				}
 
 				//default for value

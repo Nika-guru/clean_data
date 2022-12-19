@@ -4,6 +4,7 @@ import (
 	"base/pkg/log"
 	"base/service/merge/model/dao"
 	dto "base/service/merge/model/dto/coingeckgo"
+	"fmt"
 	"time"
 )
 
@@ -59,7 +60,6 @@ func crawTokens() *dao.CoinRepo {
 CrawlTokens:
 	DTOrepo := &dto.CoingeckoCoinRepo{}
 	err := DTOrepo.CrawlTokens()
-	DTOrepo.CoingeckoCoins = DTOrepo.CoingeckoCoins[29:30]
 
 	if err != nil {
 		log.Println(log.LogLevelError, "crawler/crawTokens", "Crawl function return error: "+err.Error())
@@ -68,7 +68,10 @@ CrawlTokens:
 	}
 	log.Println(log.LogLevelInfo, "crawler/crawTokens", "Crawl platform : Successfully")
 	coinRepo := &dao.CoinRepo{}
+	fmt.Println(`len`, len(DTOrepo.CoingeckoCoins))
 	DTOrepo.ConvertTo(coinRepo)
+	fmt.Println(`len`, len(coinRepo.Coins))
+
 	return coinRepo
 }
 
