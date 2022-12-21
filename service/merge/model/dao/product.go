@@ -44,7 +44,7 @@ type Product struct {
 
 func (repo *ProductRepo) InsertDB(sources map[string]bool) {
 	for _, product := range repo.Products {
-		isExist, err := product.IsExist1(sources)
+		isExist, err := product.IsExistName()
 		if err != nil {
 			log.Println(log.LogLevelError, `service/merge/model/dao/product.go/ (repo *ProductRepo) InsertDB()/ product.IsExist(), at product name `+product.Name+` from src: `+product.FromBy, err.Error())
 			continue
@@ -87,6 +87,25 @@ func (dao *Product) IsExist1(sources map[string]bool) (isExist bool, err error) 
 	}
 
 	rows, err := db.PSQL.Query(query, dao.Detail[commonSource])
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+
+	return rows.Next(), nil
+}
+
+func (dao *Product) IsExistName() (isExist bool, err error) {
+	query :=
+		`
+		SELECT 
+			*
+		FROM product
+		WHERE lower("name") = lower($1)
+	;	
+	`
+
+	rows, err := db.PSQL.Query(query, dao.Name)
 	if err != nil {
 		return false, err
 	}
