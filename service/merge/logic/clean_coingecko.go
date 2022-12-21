@@ -19,11 +19,10 @@ func AutoCrawlDataCoinGeckgo() {
 
 			for _, coinDAO := range coinDAOepo.Coins {
 				product := &dao.Product{}
-				sources := map[string]bool{
-					`coingecko`: true,
-				}
+				product.Name = coinDAO.CoinName
+
 			CheckCoinExist:
-				isExist, err := product.IsExist(sources, coinDAO.CoinCode)
+				isExist, err := product.IsExistName()
 				if err != nil {
 					log.Println(log.LogLevelError, `service/merge/logic/clean_coingecko.go/AutoCrawlData/product.IsExist(sources)`, err.Error())
 					time.Sleep(10 * time.Second)
@@ -45,6 +44,9 @@ func AutoCrawlDataCoinGeckgo() {
 				err = product.InsertDB()
 				if err != nil {
 					log.Println(log.LogLevelError, `service/merge/logic/clean_coingecko.go/AutoCrawlData/product.InsertDB()`, err.Error())
+					sources := map[string]bool{
+						`coingecko`: true,
+					}
 					for source := range sources {
 						product.InsertFail(coinDAO.CoinCode, source, err.Error())
 					}
