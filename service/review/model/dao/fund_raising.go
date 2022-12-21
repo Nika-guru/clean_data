@@ -96,7 +96,7 @@ func (dao FuncRaising) InsertDB() error {
 	dao.CreatedDate = utils.Timestamp()
 	dao.UpdatedDate = utils.Timestamp()
 
-	_, err := db.PSQL.Query(query,
+	_, err := db.PSQL.Exec(query,
 		dao.ProjectCode, dao.ProjectName, dao.ProjectLogo,
 		dao.InvestorCode, dao.InvestorName, dao.InvestorLogo,
 		dao.FundStageCode, dao.FundStageName, dao.FundAmount,

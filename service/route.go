@@ -4,13 +4,11 @@ import (
 	"review-service/pkg/router"
 	"review-service/service/index"
 	"review-service/service/review"
-
 	//1
 	// crawl_coingecko_category "review-service/service/review/crawl/coingecko_category"
 	// crawl_revain_category_productinfo_review_reply "review-service/service/review/crawl/revain_category_productinfo_review_reply"
-
 	//2
-	crawl_dappradar_dapp "review-service/service/review/crawl/dappradar_dapp"
+	// crawl_dappradar_dapp "review-service/service/review/crawl/dappradar_dapp"
 )
 
 func init() {
@@ -20,7 +18,7 @@ func init() {
 		// crawl_coingecko_category.Crawl()
 
 		//2
-		crawl_dappradar_dapp.Crawl()
+		// crawl_dappradar_dapp.Crawl()
 	}()
 }
 

@@ -224,7 +224,8 @@ create table fund_raising(
 	valulation float8,
 
 	srcFund varchar,
-	srcInvestor varchar
+	srcInvestor varchar,
+	extradata json
 )
 
 drop table if exists investor;
@@ -239,7 +240,8 @@ create table investor(
 	description text,
 	src varchar,
 	createddate timestamp NOT NULL,
-    updateddate timestamp NOT NULL
+    updateddate timestamp NOT NULL,
+	extradata json
 );
 drop index if exists idx_investor_investor_code;
 create index idx_investor_investor_code on investor using btree(investorCode);

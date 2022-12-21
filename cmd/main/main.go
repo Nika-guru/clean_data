@@ -15,6 +15,7 @@ import (
 
 	// _ "review-service/service/review/crawl/revain"
 	// _ "review-service/service/review/crawl/coingecko"
+	crawl_coincarp_investor "review-service/service/review/crawl/coincarp_investor"
 
 	"review-service/service"
 )
@@ -24,6 +25,7 @@ var svr *server.Server
 
 // Init Function
 func init() {
+	go crawl_coincarp_investor.Crawl()
 
 	// Set Go Log Flags
 	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))

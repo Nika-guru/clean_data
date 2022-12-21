@@ -14,13 +14,24 @@ import (
 )
 
 func Crawl() {
-	CrawlFundRaisings()
+	for {
+		CrawlFundRaisings()
+		time.Sleep(1 * time.Hour)
+	}
 }
 
 func CrawlFundRaisings() {
-	for idx := 0; ; idx++ {
-		fmt.Println(`====page`, (idx + 1))
-		CrawlFundRaisingsByPageIndex(idx)
+	maxGoroutines := 1
+	guard := make(chan struct{}, maxGoroutines)
+	for idx := 0; idx < 5; idx++ {
+		guard <- struct{}{} //buffered channel, full capacity, wait here --> limit go routine
+
+		go func(idx int) {
+			fmt.Println(`====page`, (idx + 1))
+			CrawlFundRaisingsByPageIndex(idx)
+			<-guard
+		}(idx)
+
 	}
 }
 
@@ -52,7 +63,7 @@ func CrawlFundRaisingsByPageIndex(idx int) {
 		//Crawl fund info(investor info)
 		fundRepo := dao.FuncRaisingRepo{}
 		fundRepo.FuncRaisingList = CrawlInvestorsByFundRasing(fundItem)
-		// fundRepo.InsertDB()
+		fundRepo.InsertDB()
 
 		//#######################################################################################################################
 		//Crawl invertors info
@@ -72,7 +83,6 @@ func CrawlFundRaisingsByPageIndex(idx int) {
 			} else {
 				if !isExist {
 					url = constant.BASE_URL_COINCARP + constant.ENDPOINT_INVESTOR_COINCARP + `/` + investor.InvestorCode
-					fmt.Println(url)
 				HTMLInvestorDetail:
 					dom := utils.GetHtmlDomByUrl(url)
 					investor.Src = url
@@ -83,7 +93,7 @@ func CrawlFundRaisingsByPageIndex(idx int) {
 
 					investorRepo.Investors = append(investorRepo.Investors, *investor)
 				}
-				// investorRepo.InsertDB()
+				investorRepo.InsertDB()
 			}
 
 		}
@@ -220,7 +230,7 @@ func CrawlDescriptionAndAnnouncementByHtmlDom(dom *goquery.Document, fundItem *F
 	})
 	fundItem.AnnouncementUrl = announcementUrl
 
-	return (description != `` && announcementUrl != ``)
+	return (description != ``) //&& announcementUrl != `` https://www.coincarp.com/fundraising/recnlembdnnfyk/
 }
 
 func CrawlInvestorByHtmlDom(dom *goquery.Document, investor *dao.Investor) (hasData bool) {
