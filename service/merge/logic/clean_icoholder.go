@@ -59,12 +59,17 @@ func CrawlAllList(endpointList string) {
 					`icoholder`: true,
 				})
 				productId := productRepo.Products[0].Id
+				//Insert fail, cuz duplicate product(code)
+				if productId == 0 {
+					continue
+				}
 
 				memberRepo := dao.MemberRepo{}
 				//update product id
 				for _, member := range members {
-					member.ProductId = uint64(productId)
-					memberRepo.Members = append(memberRepo.Members, &member)
+					tmpMember := member
+					tmpMember.ProductId = uint64(productId)
+					memberRepo.Members = append(memberRepo.Members, tmpMember)
 				}
 				memberRepo.InsertDB()
 			}
@@ -72,10 +77,6 @@ func CrawlAllList(endpointList string) {
 			<-guard
 		}
 	}(endpointList)
-}
-
-func CrawlByEndpointListAndIndex() {
-
 }
 
 func CrawlOngoingListByPagination(endpointList string, idx int) (endpoints []string) {
@@ -136,7 +137,7 @@ call:
 	return endpoints
 }
 
-func CrawlDetailByUrl(url string, isICO bool) (product dao.Product, members []dao.Member) {
+func CrawlDetailByUrl(url string, isICO bool) (product dao.Product, members []*dao.Member) {
 	product = dao.Product{}
 	if product.Detail == nil {
 		product.Detail = make(map[string]any)
@@ -149,7 +150,7 @@ func CrawlDetailByUrl(url string, isICO bool) (product dao.Product, members []da
 	//For member struct
 	productName := ``
 	productSymbol := ``
-	members = make([]dao.Member, 0)
+	members = make([]*dao.Member, 0)
 call:
 	fmt.Println(url)
 	dom := utils.GetHtmlDomJsRenderByUrl(url)
@@ -344,7 +345,7 @@ call:
 
 		domKey = `div` + utils.ConvertClassesFormatFromBrowserToGoQuery(`col-lg-4 col-sm-6 text-center mb-4`)
 		s.Find(domKey).Each(func(i int, s *goquery.Selection) {
-			member := dao.Member{}
+			member := &dao.Member{}
 			if member.Detail == nil {
 				member.Detail = make(map[string]any)
 			}
@@ -414,7 +415,7 @@ call:
 
 		domKey = `div` + utils.ConvertClassesFormatFromBrowserToGoQuery(`col-lg-4 col-sm-6 text-center mb-4`)
 		s.Find(domKey).Each(func(i int, s *goquery.Selection) {
-			member := dao.Member{}
+			member := &dao.Member{}
 			if member.Detail == nil {
 				member.Detail = make(map[string]any)
 			}
@@ -484,7 +485,7 @@ call:
 
 		domKey = `div` + utils.ConvertClassesFormatFromBrowserToGoQuery(`col-lg-4 col-sm-6 text-center mb-4`)
 		s.Find(domKey).Each(func(i int, s *goquery.Selection) {
-			member := dao.Member{}
+			member := &dao.Member{}
 			if member.Detail == nil {
 				member.Detail = make(map[string]any)
 			}

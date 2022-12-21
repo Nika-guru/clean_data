@@ -36,6 +36,10 @@ type Product struct {
 	Symbol       string
 	IsShow       bool
 	TotalWarning uint64
+	Holders      uint64
+	Transfers    uint64
+	SourceCode   string
+	ContractABI  string
 }
 
 func (repo *ProductRepo) InsertDB(sources map[string]bool) {
@@ -49,6 +53,10 @@ func (repo *ProductRepo) InsertDB(sources map[string]bool) {
 			err = product.InsertDB()
 			if err != nil {
 				log.Println(log.LogLevelError, `service/merge/model/dao/product.go/ (repo *ProductRepo) InsertDB()/ product.InsertDB(), at product name  `+product.Name+` from src: `+product.FromBy, err.Error())
+				for source := range sources {
+					productCode := product.Detail[`productCode`+strings.Title(strings.TrimSpace(source))].(string)
+					product.InsertFail(productCode, source, err.Error())
+				}
 				continue
 			}
 		}
@@ -195,4 +203,112 @@ func (repo *ProductRepo) FormatProductNameRevain() {
 		product.Name = strings.Title(strings.ToLower(product.Name))
 		product.Name = strings.ReplaceAll(product.Name, `-`, ` `)
 	}
+}
+
+//#################### Info ###################
+func (dao *Product) SelectTotal(source string) (uint64, error) {
+	query :=
+		`
+		SELECT COUNT(*) FROM product WHERE detail->>'productCode` + strings.Title(strings.TrimSpace(source)) + `' IS NOT NULL;
+	`
+	rows, err := db.PSQL.Query(query)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	var total uint64 = 0
+	if rows.Next() {
+		err = rows.Scan(&total)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return total, nil
+}
+
+func (dao *Product) SelectTotalIn24h(source string) (uint64, error) {
+	query :=
+		`
+		SELECT COUNT(*) FROM product 
+		WHERE detail->>'productCode` + strings.Title(strings.TrimSpace(source)) + `' IS NOT NULL
+			AND createddate BETWEEN (NOW() - INTERVAL '24 HOURS') AND NOW();
+	`
+	rows, err := db.PSQL.Query(query)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	var total uint64 = 0
+	if rows.Next() {
+		err = rows.Scan(&total)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return total, nil
+}
+
+func (dao *Product) SelectLatestCreatedDate(source string) (string, error) {
+	query := `
+		SELECT createddate 
+		FROM product
+		WHERE detail->>'productCode` + strings.Title(strings.TrimSpace(source)) + `' IS NOT NULL 
+		ORDER BY createddate DESC
+		LIMIT 1
+	`
+
+	rows, err := db.PSQL.Query(query)
+	if err != nil {
+		return ``, err
+	}
+	defer rows.Close()
+
+	var latestCreatedDate string = ``
+	if rows.Next() {
+		err = rows.Scan(&latestCreatedDate)
+		if err != nil {
+			return ``, err
+		}
+	}
+
+	return latestCreatedDate, nil
+}
+
+func (dao *Product) SelectCrawledFailedTotal(source string) (uint64, error) {
+	query := `
+		SELECT COUNT(*) 
+		FROM crawl_fail_3rd 
+		WHERE src = '` + strings.TrimSpace(source) + `'`
+
+	rows, err := db.PSQL.Query(query)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	var total uint64 = 0
+	if rows.Next() {
+		err = rows.Scan(&total)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return total, nil
+}
+
+func (dao *Product) InsertFail(productCode string, source string, errMsg string) error {
+	query := `
+		INSERT INTO crawl_fail_3rd
+			(productcode, src, err)
+		VALUES
+			($1, $2, $3);
+	`
+	_, err := db.PSQL.Exec(query,
+		productCode, source, errMsg)
+	return err
 }

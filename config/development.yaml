@@ -25,7 +25,7 @@ DB_NAME: "gear5_data" #"gear5_data"
 
 
 # Log config : ABSOLUTE PATH
-LOG_OUTPUT : "/home/BACKEND/log.log"   # IF COMMENT : LOG_OUTPUT = CONSOLE
+# LOG_OUTPUT : "/home/BACKEND/log.log"   # IF COMMENT : LOG_OUTPUT = CONSOLE
 
 # /home/BACKEND/base-service.log
 # AWS S3 Configuration 

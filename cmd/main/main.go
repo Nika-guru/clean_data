@@ -14,7 +14,7 @@ import (
 	"crawler/pkg/server"
 
 	"crawler/service"
-	_ "crawler/service/merge/logic"
+	// _ "crawler/service/merge/logic"
 )
 
 // Server Variable

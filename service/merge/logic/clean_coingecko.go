@@ -47,6 +47,9 @@ func AutoCrawlDataCoinGeckgo() {
 				err = product.InsertDB()
 				if err != nil {
 					log.Println(log.LogLevelError, `service/merge/logic/clean_coingecko.go/AutoCrawlData/product.InsertDB()`, err.Error())
+					for source := range sources {
+						product.InsertFail(coinDAO.CoinCode, source, err.Error())
+					}
 				}
 			}
 			//Wait in duration for next time call API
