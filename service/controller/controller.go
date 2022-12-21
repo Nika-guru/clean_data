@@ -18,7 +18,7 @@ type ResponseInfoCrawl struct {
 }
 
 func Info(w http.ResponseWriter, r *http.Request) {
-	source := `coingecko`
+	source := `icoholder`
 
 	product := &dao.Product{}
 	rs, err := product.SelectTotal(source)
