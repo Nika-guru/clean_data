@@ -23,17 +23,18 @@ func AutoCrawlDataIcoHolder() {
 	for {
 		CrawlAllList(_endpointOngoingListByPage)
 		CrawlAllList(_endpointUpcommingListByPage)
-		time.Sleep(12 * time.Hour)
+		time.Sleep(2 * time.Hour)
 	}
 }
 
 func CrawlAllList(endpointList string) {
 	maxGoroutines := 2
 	guard := make(chan struct{}, maxGoroutines)
-	for idx := 0; ; idx++ {
-		guard <- struct{}{} //buffered channel, full capacity, wait here --> limit go routine
 
-		go func(endpointList string, idx int) {
+	go func(endpointList string) {
+		for idx := 0; ; idx++ {
+			guard <- struct{}{} //buffered channel, full capacity, wait here --> limit go routine
+
 			endpoints := CrawlOngoingListByPagination(endpointList, idx)
 
 			//last page have data
@@ -69,8 +70,8 @@ func CrawlAllList(endpointList string) {
 			}
 
 			<-guard
-		}(endpointList, idx)
-	}
+		}
+	}(endpointList)
 }
 
 func CrawlByEndpointListAndIndex() {
