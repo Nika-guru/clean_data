@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	go AutoCrawlDataIcoHolder()
+	go AutoCrawlDataCoinGeckgo()
 	go func() {
 		//FormatSocialsDappRadar// FormatSocialsDappRadarVer2()
 		// MergeDataDappradarAndRevain()
