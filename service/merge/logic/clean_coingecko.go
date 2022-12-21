@@ -4,7 +4,6 @@ import (
 	"crawler/pkg/log"
 	"crawler/service/merge/model/dao"
 	dto "crawler/service/merge/model/dto/coingeckgo"
-	"fmt"
 	"time"
 )
 
@@ -43,7 +42,6 @@ func AutoCrawlDataCoinGeckgo() {
 				}
 
 				coinDAO.ConvertToProduct(product)
-				//test
 				err = product.InsertDB()
 				if err != nil {
 					log.Println(log.LogLevelError, `service/merge/logic/clean_coingecko.go/AutoCrawlData/product.InsertDB()`, err.Error())
@@ -71,9 +69,7 @@ CrawlTokens:
 	}
 	log.Println(log.LogLevelInfo, "crawler/crawTokens", "Crawl platform : Successfully")
 	coinRepo := &dao.CoinRepo{}
-	fmt.Println(`len`, len(DTOrepo.CoingeckoCoins))
 	DTOrepo.ConvertTo(coinRepo)
-	fmt.Println(`len`, len(coinRepo.Coins))
 
 	return coinRepo
 }
