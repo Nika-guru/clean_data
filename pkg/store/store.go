@@ -1,7 +1,7 @@
 package store
 
 import (
-	"base/pkg/server"
+	"crawler/pkg/server"
 	"strings"
 )
 

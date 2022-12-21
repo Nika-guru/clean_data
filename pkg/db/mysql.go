@@ -3,7 +3,7 @@ package db
 import (
 	"database/sql"
 
-	"base/pkg/log"
+	"crawler/pkg/log"
 
 	_ "github.com/go-sql-driver/mysql"
 )

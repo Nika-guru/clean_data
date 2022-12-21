@@ -1,7 +1,7 @@
 package db
 
 import (
-	"base/pkg/log"
+	"crawler/pkg/log"
 
 	mgo "gopkg.in/mgo.v2"
 )

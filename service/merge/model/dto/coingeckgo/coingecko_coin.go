@@ -1,9 +1,9 @@
 package dto
 
 import (
-	"base/pkg/log"
-	"base/pkg/utils"
-	"base/service/merge/model/dao"
+	"crawler/pkg/log"
+	"crawler/pkg/utils"
+	"crawler/service/merge/model/dao"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"

@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"base/pkg/log"
+	"crawler/pkg/log"
 	"sync"
 	"time"
 

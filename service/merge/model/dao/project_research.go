@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"base/pkg/db"
+	"crawler/pkg/db"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -75,7 +75,7 @@ func (repo *ProjectResearchRepo) SelectAll() error {
 	return nil
 }
 
-func (repo *ProjectResearchRepo) ConvertToProjectAndCoinRepo(projectRepo *ProjectRepo, coinRepo *CoinRepo) {
+func (repo *ProjectResearchRepo) ConvertToProductRepo(productRepo *ProductRepo) {
 	deletedIds := make([]string, 0)
 	for _, projectResearch := range repo.ProjectResearchList {
 		switch strings.TrimSpace(projectResearch.Type) {
@@ -85,78 +85,121 @@ func (repo *ProjectResearchRepo) ConvertToProjectAndCoinRepo(projectRepo *Projec
 		case `token`:
 			fallthrough
 		case `ico`:
-			dao := &Coin{}
-			coinRepo.Coins = append(coinRepo.Coins, dao)
+			dao := &Product{}
 
-			deletedIds = append(deletedIds, projectResearch.Id)
-			//dApp
-		case `project`:
-			dao := &Project{}
-			dao.ProjectCode = ``
-			dao.ProjectName = projectResearch.Name
-			dao.ProjectCategory = projectResearch.Category
-			dao.ProjectSubcategory = projectResearch.Subcategory
-
-			//avoid nil pointer below
-			if projectResearch.Detail == nil {
-				projectResearch.Detail = make(map[string]any, 0)
-			}
-
-			community, foundCommunity := projectResearch.Detail[`community`]
-			if foundCommunity && len(community.(map[string]any)) > 0 {
-				dao.Socials = make(map[string]any, 0)
-				dao.Socials[`social`] = make([]string, 0)
-				urls := make([]string, 0)
-				for _, url := range community.(map[string]any) {
-					if strings.TrimSpace(url.(string)) != `` {
-						urls = append(urls, url.(string))
-					}
-				}
-				dao.Socials[`social`] = urls
-			}
-			dao.ProjectImage = projectResearch.Image
-			description, foundDescription := projectResearch.Detail[`description`]
-			if foundDescription {
-				dao.ProjectDescription = description.(string)
+			dao.Type = projectResearch.Type
+			if projectResearch.Address == `` {
+				dao.Address = `NULL`
 			} else {
-				dao.ProjectDescription = ``
+				dao.Address = projectResearch.Address
 			}
-			dao.ChainId = projectResearch.ChainId
-			//Don't have chain id
-			if strings.TrimSpace(projectResearch.ChainId) == `` {
-				dao.ChainId = `0`
+			if projectResearch.ChainId == `` {
+				dao.ChainId = `NULL`
 				dao.ChainName = `NULL`
-			} else
-			//Have chain id
-			{
-				chainList := &ChainList{}
+			} else {
+				dao.ChainId = projectResearch.ChainId
+
+				chainList := ChainList{}
 				chainList.ChainId = projectResearch.ChainId
 				chainList.SelectChainNameByChainId()
-				//
-				if strings.TrimSpace(chainList.ChainName) == `` {
+				if chainList.ChainName == `` {
 					dao.ChainName = `NULL`
 				} else {
 					dao.ChainName = chainList.ChainName
 				}
 			}
+			dao.Symbol = strings.ToUpper(projectResearch.Symbol)
+			dao.Name = projectResearch.Name
+			dao.Category = projectResearch.Category
+			dao.Subcategory = projectResearch.Subcategory
+			dao.Detail = make(map[string]any)
 
-			sourceCode, foundSourceCode := projectResearch.Detail[`sourceCode`]
-			if foundSourceCode {
-				dao.ExtraData[`sourceCode`] = sourceCode
+			desc, foundDesc := projectResearch.Detail[`description`]
+			if foundDesc {
+				dao.Description = desc.(string)
 			}
+			dao.Detail = projectResearch.Detail
+			dao.FromBy = `research`
+			dao.Detail[`totalSupply`] = 0
+			dao.Detail[`maxSupply`] = projectResearch.TotalSupply
+			dao.Detail[`marketcap`] = 0
+			dao.Detail[`volumeTrading`] = 0
+			dao.Detail[`holder`] = 0
+			dao.Detail[`decimals`] = projectResearch.Decimals
 
-			website, foundWebsite := projectResearch.Detail[`website`]
-			if foundWebsite {
-				dao.ExtraData[`website`] = website
-			}
+			dao.Image = projectResearch.Image
 
-			dao.ExtraData = make(map[string]any) //
-			dao.Src = `researcher`
-			dao.Tvl = 0
-			dao.TotalUsed = 0
-			projectRepo.Projects = append(projectRepo.Projects, dao)
+			productRepo.Products = append(productRepo.Products, dao)
 
 			deletedIds = append(deletedIds, projectResearch.Id)
+			//dApp
+		case `project`:
+			// dao := &Project{}
+			// dao.ProjectCode = ``
+			// dao.ProjectName = projectResearch.Name
+			// dao.ProjectCategory = projectResearch.Category
+			// dao.ProjectSubcategory = projectResearch.Subcategory
+
+			// //avoid nil pointer below
+			// if projectResearch.Detail == nil {
+			// 	projectResearch.Detail = make(map[string]any, 0)
+			// }
+
+			// community, foundCommunity := projectResearch.Detail[`community`]
+			// if foundCommunity && len(community.(map[string]any)) > 0 {
+			// 	dao.Socials = make(map[string]any, 0)
+			// 	dao.Socials[`social`] = make([]string, 0)
+			// 	urls := make([]string, 0)
+			// 	for _, url := range community.(map[string]any) {
+			// 		if strings.TrimSpace(url.(string)) != `` {
+			// 			urls = append(urls, url.(string))
+			// 		}
+			// 	}
+			// 	dao.Socials[`social`] = urls
+			// }
+			// dao.ProjectImage = projectResearch.Image
+			// description, foundDescription := projectResearch.Detail[`description`]
+			// if foundDescription {
+			// 	dao.ProjectDescription = description.(string)
+			// } else {
+			// 	dao.ProjectDescription = ``
+			// }
+			// dao.ChainId = projectResearch.ChainId
+			// //Don't have chain id
+			// if strings.TrimSpace(projectResearch.ChainId) == `` {
+			// 	dao.ChainId = `0`
+			// 	dao.ChainName = `NULL`
+			// } else
+			// //Have chain id
+			// {
+			// 	chainList := &ChainList{}
+			// 	chainList.ChainId = projectResearch.ChainId
+			// 	chainList.SelectChainNameByChainId()
+			// 	//
+			// 	if strings.TrimSpace(chainList.ChainName) == `` {
+			// 		dao.ChainName = `NULL`
+			// 	} else {
+			// 		dao.ChainName = chainList.ChainName
+			// 	}
+			// }
+
+			// sourceCode, foundSourceCode := projectResearch.Detail[`sourceCode`]
+			// if foundSourceCode {
+			// 	dao.ExtraData[`sourceCode`] = sourceCode
+			// }
+
+			// website, foundWebsite := projectResearch.Detail[`website`]
+			// if foundWebsite {
+			// 	dao.ExtraData[`website`] = website
+			// }
+
+			// dao.ExtraData = make(map[string]any) //
+			// dao.Src = `research`
+			// dao.Tvl = 0
+			// dao.TotalUsed = 0
+			// productRepo.Products = append(productRepo.Products, dao)
+
+			// deletedIds = append(deletedIds, projectResearch.Id)
 		}
 	}
 

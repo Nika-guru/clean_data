@@ -8,13 +8,13 @@ import (
 	"strings"
 	"syscall"
 
-	"base/pkg/cache"
-	"base/pkg/db"
-	"base/pkg/router"
-	"base/pkg/server"
+	"crawler/pkg/cache"
+	"crawler/pkg/db"
+	"crawler/pkg/router"
+	"crawler/pkg/server"
 
-	"base/service"
-	_ "base/service/merge/logic"
+	"crawler/service"
+	_ "crawler/service/merge/logic"
 )
 
 // Server Variable

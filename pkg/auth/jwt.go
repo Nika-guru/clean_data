@@ -8,10 +8,10 @@ import (
 	// Golang implementation of JSON Web Tokens
 	jwt "github.com/dgrijalva/jwt-go"
 
-	"base/pkg/crypt"
-	"base/pkg/log"
-	"base/pkg/router"
-	"base/pkg/server"
+	"crawler/pkg/crypt"
+	"crawler/pkg/log"
+	"crawler/pkg/router"
+	"crawler/pkg/server"
 )
 
 // ResGetJWT Struct

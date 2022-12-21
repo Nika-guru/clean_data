@@ -1,9 +1,9 @@
 package logic
 
 import (
-	"base/pkg/log"
-	"base/service/merge/model/dao"
-	dto "base/service/merge/model/dto/coingeckgo"
+	"crawler/pkg/log"
+	"crawler/service/merge/model/dao"
+	dto "crawler/service/merge/model/dto/coingeckgo"
 	"fmt"
 	"time"
 )

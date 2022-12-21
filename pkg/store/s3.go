@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"base/pkg/log"
-	"base/pkg/server"
+	"crawler/pkg/log"
+	"crawler/pkg/server"
 
 	minio "github.com/minio/minio-go"
 )

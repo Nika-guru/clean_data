@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"base/pkg/db"
+	"crawler/pkg/db"
 	"encoding/json"
 	"strings"
 )

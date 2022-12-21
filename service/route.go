@@ -1,8 +1,8 @@
 package service
 
 import (
-	"base/pkg/router"
-	"base/service/index"
+	"crawler/pkg/router"
+	"crawler/service/index"
 )
 
 // LoadRoutes to Load Routes to Router

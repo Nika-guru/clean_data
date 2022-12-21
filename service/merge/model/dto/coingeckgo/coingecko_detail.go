@@ -1,8 +1,8 @@
 package dto
 
 import (
-	"base/pkg/log"
-	"base/service/merge/model/dao"
+	"crawler/pkg/log"
+	"crawler/service/merge/model/dao"
 	"encoding/json"
 	"errors"
 	"fmt"

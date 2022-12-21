@@ -6,12 +6,12 @@ import (
 
 	"github.com/go-chi/chi"
 
-	// "base/pkg/cache"
+	// "crawler/pkg/cache"
 
-	"base/pkg/cache"
-	"base/pkg/db"
-	"base/pkg/log"
-	"base/pkg/server"
+	"crawler/pkg/cache"
+	"crawler/pkg/db"
+	"crawler/pkg/log"
+	"crawler/pkg/server"
 )
 
 // RouterBasePath Variable

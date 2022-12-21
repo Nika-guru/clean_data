@@ -22,3 +22,16 @@ DROP VIEW IF EXISTS tmp_project_id_dappradar_intersect_revain;
 		)
 	ORDER BY dappradar.id
 );
+
+create table member(
+	memberName varchar,
+	productId bigint,
+	productName varchar,
+	productSymbol varchar,
+	
+	createdDate varchar,
+	updatedDate varchar,
+	detail json
+);
+create index idx_member_member_name on member using btree(memberName);
+create index idx_member_product_id on member using hash(productId);

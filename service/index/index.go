@@ -1,7 +1,7 @@
 package index
 
 import (
-	"base/pkg/router"
+	"crawler/pkg/router"
 	"net/http"
 )
 

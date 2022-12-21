@@ -11,7 +11,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"base/pkg/server"
+	"crawler/pkg/server"
 )
 
 // Log Variable

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"base/pkg/server"
+	"crawler/pkg/server"
 )
 
 // Router CORS Configuration Struct

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"base/pkg/log"
+	"crawler/pkg/log"
 
 	_ "github.com/lib/pq"
 )

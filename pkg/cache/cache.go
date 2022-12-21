@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"base/pkg/server"
+	"crawler/pkg/server"
 	"strings"
 )
 

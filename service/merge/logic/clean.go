@@ -1,15 +1,14 @@
 package logic
 
 import (
-	"base/pkg/log"
-	"base/service/merge/model/dao"
+	"crawler/pkg/log"
+	"crawler/service/merge/model/dao"
 	"fmt"
 	"strings"
 )
 
 func init() {
-	AutoCrawlDataCoinGeckgo()
-	return
+	go AutoCrawlDataIcoHolder()
 	go func() {
 		//FormatSocialsDappRadar// FormatSocialsDappRadarVer2()
 		// MergeDataDappradarAndRevain()
@@ -253,21 +252,12 @@ func FormatDataProjectResearch() {
 	projectResearchRepo := &dao.ProjectResearchRepo{}
 	projectResearchRepo.SelectAll()
 
-	fmt.Println(len(projectResearchRepo.ProjectResearchList), projectResearchRepo.ProjectResearchList[0])
-
-	projectRepo := &dao.ProjectRepo{}
-	coinRepo := &dao.CoinRepo{}
-	projectResearchRepo.ConvertToProjectAndCoinRepo(projectRepo, coinRepo)
-	return
-
 	productRepo := &dao.ProductRepo{}
-	sources := map[string]bool{
-		`researcher`: true,
-	}
-	projectRepo.ConvertToProductRepo(productRepo, sources)
-	productRepo.InsertDB(sources)
+	projectResearchRepo.ConvertToProductRepo(productRepo)
 
-	productRepo = &dao.ProductRepo{}
-	// coinRepo.ConvertToProductRepo(productRepo, sources)
+	sources := map[string]bool{
+		`research`: true,
+	}
+
 	productRepo.InsertDB(sources)
 }

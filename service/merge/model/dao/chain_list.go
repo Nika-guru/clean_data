@@ -1,6 +1,6 @@
 package dao
 
-import "base/pkg/db"
+import "crawler/pkg/db"
 
 type ChainListRepo struct {
 	ChainLists []ChainList

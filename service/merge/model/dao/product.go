@@ -1,9 +1,9 @@
 package dao
 
 import (
-	"base/pkg/db"
-	"base/pkg/log"
-	"base/pkg/utils"
+	"crawler/pkg/db"
+	"crawler/pkg/log"
+	"crawler/pkg/utils"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -35,10 +35,11 @@ type Product struct {
 	Contract     map[string]any
 	Symbol       string
 	IsShow       bool
+	TotalWarning uint64
 }
 
 func (repo *ProductRepo) InsertDB(sources map[string]bool) {
-	for idx, product := range repo.Products {
+	for _, product := range repo.Products {
 		isExist, err := product.IsExist1(sources)
 		if err != nil {
 			log.Println(log.LogLevelError, `service/merge/model/dao/product.go/ (repo *ProductRepo) InsertDB()/ product.IsExist(), at product name `+product.Name+` from src: `+product.FromBy, err.Error())
@@ -50,7 +51,6 @@ func (repo *ProductRepo) InsertDB(sources map[string]bool) {
 				log.Println(log.LogLevelError, `service/merge/model/dao/product.go/ (repo *ProductRepo) InsertDB()/ product.InsertDB(), at product name  `+product.Name+` from src: `+product.FromBy, err.Error())
 				continue
 			}
-			fmt.Println(`insert new `, idx)
 		}
 	}
 }
@@ -136,7 +136,8 @@ func (dao *Product) InsertDB() error {
 			$10, $11, $12,
 			$13, $14, $15,
 			$16, $17, $18,
-			$19, $20);
+			$19, $20)
+	RETURNING id;
 	`
 	//Default value
 	dao.CreatedDate = utils.Timestamp()
@@ -157,14 +158,14 @@ func (dao *Product) InsertDB() error {
 		return err
 	}
 
-	_, err = db.PSQL.Exec(query,
+	err = db.PSQL.QueryRow(query,
 		dao.Type, dao.Address, dao.ChainId,
 		dao.ChainName, dao.Name, dao.Image,
 		dao.Description, dao.Category, dao.Subcategory,
 		detailJSON, dao.CreatedDate, dao.UpdatedDate,
 		dao.TotalReviews, dao.TotalIsScam, dao.TotalNotScam,
 		dao.IsScam, dao.FromBy, contractJSON,
-		dao.Symbol, dao.IsShow)
+		dao.Symbol, dao.IsShow).Scan(&dao.Id)
 	if err != nil {
 		return err
 	}
